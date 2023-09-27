@@ -1,0 +1,61 @@
+map $http_upgrade $connection_upgrade {
+  default Upgrade;
+  '' close;
+}
+
+# server block 定義 proxy server 的相關設定
+server {
+  listen $WEB_PORT;
+  server_name localhost;
+  client_max_body_size 100M;
+  proxy_connect_timeout 600;
+  proxy_send_timeout 600;
+  proxy_read_timeout 600;
+  send_timeout 600;
+
+  # 定義domain的位置，如果location跟這邊不同，代理轉發就可能出問題
+  proxy_set_header Host $host;
+  proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+  location / {
+    try_files $uri /index.html;
+  }
+
+  # 轉發代理到API
+  location /socket.io/ {
+    proxy_pass http://127.0.0.1:$API_PORT/socket.io/;
+    proxy_redirect off;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+    proxy_set_header Host $host:$server_port;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Real-PORT $remote_port;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+
+  location /ivit/ {
+    proxy_pass http://127.0.0.1:$API_PORT/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+    proxy_set_header Host $host:$server_port;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Real-PORT $remote_port;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+
+  location /icap/ {
+    proxy_pass http://127.0.0.1:$API_PORT/icap/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+    proxy_set_header Host $host:$server_port;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Real-PORT $remote_port;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+
+}
+
