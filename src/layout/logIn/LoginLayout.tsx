@@ -2,6 +2,9 @@ import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Header from '../../component/Header/Header';
 import Projects from '../../pages/projects/Projects';
+
+import AutoLabel from '../../pages/autoLabel';
+
 import Main from '../../pages/Main'
 import { useAllProjectInit } from '../../pages/projects/hook/useAllProjects';
 import { createContext, useCallback, useEffect, useState } from 'react';
@@ -14,6 +17,7 @@ import { getShareUrlAPI, exportIcapAPI } from '../../constant/API/exportAPI';
 import ShowURLDialog from '../../component/Dialogs/ShowURLDialog';
 import { selectColorBar, setColorBars } from '../../redux/store/slice/colorBar';
 import { getColorBarAPI } from '../../constant/API';
+
 
 const Wrapper = styled.div`
   background-color: ${props => props.theme.color.base_1};
@@ -212,6 +216,9 @@ function LoginLayout() {
           />
         </Wrapper>
       </div>
+
+    
+
     </WsContext.Provider>
   );
 }

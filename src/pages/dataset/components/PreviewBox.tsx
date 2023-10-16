@@ -1,4 +1,5 @@
-import { Dispatch, SetStateAction, useContext, useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, useContext, useMemo, useState,useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ClassLabel from '../../../component/Label/ClassLabel';
 import { ResGetImgLabelType } from '../../../constant/API';
@@ -14,6 +15,8 @@ import { ImageWHProps, useDraw, useGetBoxInfo } from '../../label/hook/useLabelP
 import { SliderArrow } from '../../label/LabelPage';
 import ArrowIcon from '../../../component/ClickArrow/ArrowIcon';
 import ClickArrow from '../../../component/ClickArrow/ClickArrow';
+
+import { setCurrentBbox,setSizeInfo } from '../../../redux/store/slice/currentBbox';
 
 const LabelWrapper = styled.div`
   width: 416px;
@@ -102,6 +105,21 @@ const PreviewBox = (props: PreviewProps) => {
     })
   }
 
+  const navigate = useNavigate();
+
+  // useEffect(() => {
+   
+  //   console.log('boxInfo')
+  //   console.log(boxInfo)
+  //   dispatch(setCurrentBbox(boxInfo))
+  //   const sizeInfo:any={};
+  //   sizeInfo.imageWidth=imgInfo.naturalWidth;
+  //   sizeInfo.imageHeight=imgInfo.naturalHeight;
+  //   sizeInfo.mediaWidth=imgInfo.width;
+  //   sizeInfo.mediaHeight=imgInfo.height;
+  //   dispatch(setSizeInfo(sizeInfo))
+    
+  // }, [boxInfo]);
 
 
 

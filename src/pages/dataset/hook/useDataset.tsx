@@ -16,17 +16,15 @@ export type ClassInfoType = {
   },
 }
 
-export type ProjectDataType = {
-  All: number,
-  Unlabeled: number,
-  classInfo: ClassInfoType,
-  iterName: string,
-  sortClass: string[],
-  classNumber: Record<string, number>;
-};
-
 export type AllProjectDataType = {
-  [key: string]: ProjectDataType
+  [key: string]: {
+    All: number,
+    Unlabeled: number,
+    classInfo: ClassInfoType,
+    iterName: string,
+    sortClass: string[],
+    classNumber: Record<string, number>;
+  }
 };
 
 
@@ -35,61 +33,98 @@ async function getDatasetInfo(projectId: string, isLabelPage?: boolean) {
   const iterationInfoList = [];
   const projectData: Record<string, any> = {};
   //如果是label page就一定是在workspace做的，不須再多打getDatasetListAPI跟跑loop拿toGetClassAndNumberAPI
-  const iterListData = isLabelPage ? [] : (await getDatasetListAPI(projectId)).data.data.folder_name;
-  const iterNameList = isLabelPage ? ['workspace'] : Object.values(iterListData);
+  if (isLabelPage) {
+    await toGetClassAndNumberAPI(projectId, 'workspace')
+      .then(({ data }) => {
+        if (data) {
+          const result = data.data;
+          let clsInfo: any = {}
+          const clsNb: Record<string, number> = {};
+          result.sort_list.map((cls) => {
+            clsInfo = { ...result.classes_info };
+            clsInfo[cls].name = cls;
+            clsInfo[cls].inputValue = cls;
+            clsNb[cls] = result.classes_info[cls].nums
+          });
 
-  for (let i = 0; i < iterNameList.length; i++) {
-    try {
-      const data = await toGetClassAndNumberAPI(projectId, iterNameList[i]);
-      const result = data.data.data;
+          projectData['workspace'] = {
+            iterName: 'workspace',
+            All: result.All,
+            Unlabeled: result.Unlabeled,
+            classInfo: clsInfo,
+            sortClass: result.sort_list,
+            classNumber: clsNb
+          }
 
-      let clsInfo: any = {}
-      const clsNb: Record<string, number> = {};
-      result.sort_list.map((cls) => {
-        clsInfo = { ...result.classes_info };
-        clsInfo[cls].name = cls;
-        clsInfo[cls].inputValue = cls;
-        clsNb[cls] = result.classes_info[cls].nums
-      });
-
-      projectData[iterNameList[i]] = {
-        iterName: iterNameList[i],
-        All: result.All,
-        Unlabeled: result.Unlabeled,
-        classInfo: clsInfo,
-        sortClass: result.sort_list,
-        classNumber: clsNb
-      }
-
-      iterationInfoList.push({
-        iterName: iterNameList[i],
-        All: result.All,
-        Unlabeled: result.Unlabeled,
-        classInfo: clsInfo,
-        sortClass: result.sort_list,
-        classNumber: clsNb
+          iterationInfoList.push({
+            iterName: 'workspace',
+            All: result.All,
+            Unlabeled: result.Unlabeled,
+            classInfo: clsInfo,
+            sortClass: result.sort_list,
+            classNumber: clsNb
+          });
+        }
       })
+      .catch((res) => {
+        console.log('isLabelPage-err', res);
+      })
+  } else {
+    const iterListData = await getDatasetListAPI(projectId);
+    const iterNameList = Object.values(iterListData.data.data.folder_name);
 
-    } catch (err) {
-      console.log('getDatasetInfo Error!', err);
-      //暫時放入空的值以顯示頁面，要另外判斷是API錯誤不然是呈現空狀態的畫面
-      // iterationInfoList.push({ iterName: 'workspace', All: 0, Unlabeled: 0, classInfo: {}, sortClass: [], classNumber: {} })
-      projectData['workspace'] = {
-        iterName: 'workspace',
-        All: 0,
-        Unlabeled: 0,
-        classInfo: {},
-        sortClass: [],
-        classNumber: 0
+    for (let i = 0; i < iterNameList.length; i++) {
+      try {
+        const data = await toGetClassAndNumberAPI(projectId, iterNameList[i]);
+        const result = data.data.data;
+
+        let clsInfo: any = {}
+        const clsNb: Record<string, number> = {};
+        result.sort_list.map((cls) => {
+          clsInfo = { ...result.classes_info };
+          clsInfo[cls].name = cls;
+          clsInfo[cls].inputValue = cls;
+          clsNb[cls] = result.classes_info[cls].nums
+        });
+
+        projectData[iterNameList[i]] = {
+          iterName: iterNameList[i],
+          All: result.All,
+          Unlabeled: result.Unlabeled,
+          classInfo: clsInfo,
+          sortClass: result.sort_list,
+          classNumber: clsNb
+        }
+
+        iterationInfoList.push({
+          iterName: iterNameList[i],
+          All: result.All,
+          Unlabeled: result.Unlabeled,
+          classInfo: clsInfo,
+          sortClass: result.sort_list,
+          classNumber: clsNb
+        })
+
+      } catch (err) {
+        console.log('getDatasetInfo Error!', err);
+        //暫時放入空的值以顯示頁面，要另外判斷是API錯誤不然是呈現空狀態的畫面
+        // iterationInfoList.push({ iterName: 'workspace', All: 0, Unlabeled: 0, classInfo: {}, sortClass: [], classNumber: {} })
+        projectData['workspace'] = {
+          iterName: 'workspace',
+          All: 0,
+          Unlabeled: 0,
+          classInfo: {},
+          sortClass: [],
+          classNumber: 0
+        }
       }
     }
   }
 
+
   return {
     projectData,
-    iterationInfoList,
-    iterListData
-
+    iterationInfoList
   };
 }
 
@@ -106,24 +141,18 @@ type CombinedClass = {
 export const useFetchIterationInfo = (datasetId: string) => {
   //for classification upload select class list
   const [combinedClass, setCombinedClass] = useState<CombinedClass[]>([]);
-  const [projectIterList, setProjectIterList] = useState<string[]>(['']);
   const lastColorId = useSelector(selectLastColorId).lastColorId;
   const dispatch = useDispatch();
-
-  const handelSidebarList = (projectIterList: string[]) => {
-    const filteredList = projectIterList.filter((name => name !== 'workspace'))
-    setProjectIterList(filteredList)
-  }
 
   const datasetInfoApiCallback = useCallback((datasetId: string, isLabelPage?: boolean) => {
     getDatasetInfo(datasetId, isLabelPage)
       .then((data) => {
         if (data) {
-          handelSidebarList(data.iterListData);
-          const workData = data.projectData['workspace'];
-          dispatch(setProjectDataAction(data.projectData));
+          dispatch(setProjectDataAction(data.projectData))
 
-          const workDataSortClass: string[] = workData['sortClass'];
+          const workData = data.projectData['workspace']
+          const workDataSortClass: string[] = workData['sortClass']
+
           setCombinedClass(workDataSortClass.map((cls: string) => (
             {
               name: cls,
@@ -132,11 +161,13 @@ export const useFetchIterationInfo = (datasetId: string) => {
               color_hex: workData['classInfo'][cls].color_hex,
               color_id: String(workData['classInfo'][cls].color_id),
               nums: workData['classInfo'][cls].nums
-            })))
+            }))
+          )
         }
       })
       .finally(() => dispatch(closeLoading()))
   }, [dispatch]);
+
 
 
   //換project要重設
@@ -161,10 +192,8 @@ export const useFetchIterationInfo = (datasetId: string) => {
   }, [datasetInfoApiCallback, datasetId, dispatch]);
 
 
-
   return {
     combinedClass,
-    projectIterList,
     datasetInfoApiCallback
   };
 }

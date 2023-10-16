@@ -10,7 +10,9 @@ import { ControlBtnContainer, StyledMoreButton, StyledUploadBtn, Left, CardWrapp
 import { selectIteration } from "../../redux/store/slice/currentIteration"
 import ProjectTag from '../../component/ProjectTag';
 import { MainContext } from '../Main';
-import { selectCurrentTab } from '../../redux/store/slice/currentTab';
+import { selectCurrentTab, setCurrentTab } from '../../redux/store/slice/currentTab';
+import { selectCurrentIdx,setCurrentIdx } from '../../redux/store/slice/currentIdx';
+
 import LabelPage from '../label/LabelPage';
 import { ClassListType } from '../../component/Select/CreateSearchSelect';
 import PhotoFrameItem from './components/PhotoFrame';
@@ -19,7 +21,7 @@ import { selectDisableBtn, setDisableBtn } from "../../redux/store/slice/disable
 import { selectProjectData } from "../../redux/store/slice/projectData";
 import { selectCurrentTrainInfo } from "../../redux/store/slice/currentTrainInfo";
 import { selectSocketId } from "../../redux/store/slice/socketId";
-
+import { log } from "console";
 
 export type selectCardClassType = {
   [key: string]: number
@@ -51,6 +53,7 @@ function Dataset(props: DatasetPropsType) {
   const { activeClassName, setActiveClassName, dataType, datasetId, combinedClass } = useContext(MainContext);
   const currentIter = useSelector(selectIteration).iteration;
   const currentTab = useSelector(selectCurrentTab).tab;
+  const currentIdx = useSelector(selectCurrentIdx).idx;
   const disableBtn = useSelector(selectDisableBtn).disableBtn;
   const projectData = useSelector(selectProjectData).projectData;
   const trainData = useSelector(selectCurrentTrainInfo).currTrain;
@@ -78,9 +81,25 @@ function Dataset(props: DatasetPropsType) {
   }, []);
 
   const handleImgClick = (e: MouseEvent<HTMLDivElement>) => {
-    setCurrIndex(Number(e.currentTarget.id));
+    console.log('image one click')
+    console.log(Number(e.currentTarget.id));
+    console.log('========================')
+    //setCurrIndex(Number(e.currentTarget.id));
+    dispatch(setCurrentIdx(Number(e.currentTarget.id)));
   };
 
+  const handleImgDoubleClick = (e: MouseEvent<HTMLDivElement>) => {
+
+    console.log('image double click')
+    console.log(Number(e.currentTarget.id));
+    console.log('========================')
+
+
+    setCurrIndex(Number(e.currentTarget.id));
+    
+    dispatch(setCurrentIdx(Number(e.currentTarget.id)));
+    dispatch(setCurrentTab('Label'));
+  };
 
   const selectImgTotal = useMemo(() => {
     let total: number;
@@ -143,6 +162,8 @@ function Dataset(props: DatasetPropsType) {
         itemData={initDeleteData.delInfo}
       >
         {({ index, style, data }) => {
+
+
           return (
             <div
               key={index}
@@ -167,6 +188,7 @@ function Dataset(props: DatasetPropsType) {
                     setSelectPhotoList={setSelectPhotoList}
                     currIndex={currIndex}
                     handleImgClick={handleImgClick}
+                    handleImgDoubleClick={handleImgDoubleClick}
                     idSelectMap={idSelectMap}
                     openDeleteTab={openDeleteTab}
                   />
@@ -225,6 +247,7 @@ function Dataset(props: DatasetPropsType) {
   const confirmInitData = useCallback((imgDataList: string[]) => {
     if (!workspaceInfo) return null;
     //workspaceInfo.sortClass.length === 0 因為有可能是有其他class只是數量都是0
+    
     if (currentIter === 'workspace' && workspaceInfo && workspaceInfo.All === 0 && workspaceInfo.sortClass.length === 0) {
       return (
         <EmptyWrapper style={{ minHeight: 'calc(100vh - 150px)' }}>
@@ -283,6 +306,15 @@ function Dataset(props: DatasetPropsType) {
     checkCardNumber(projectData, currentIter)
   }, [currentIter, checkCardNumber, projectData]);
 
+  // useEffect(() => {
+
+  //   console.log('current index...')
+  //   console.log(currentIdx)
+
+
+  //   setCurrentIdx(currentIdx)
+  // }, [currentIdx]);
+
 
   useEffect(() => {
     //切到label再切回dataset會導致reference改變而被重新設成0
@@ -296,11 +328,40 @@ function Dataset(props: DatasetPropsType) {
     if (selectPhotoList.length > 0) setOpenDeleteTab(true)
   }, [selectPhotoList.length]);
 
+  // useEffect(() => {
+  //   if (currIndex + 1 > imgDataList.length) {
+  //     console.log('reset index to 0')
+  //     setCurrIndex(0)
+  //   }
+  // }, [currIndex, imgDataList.length]);
+
+  // useEffect(() => {
+
+  //   console.log('current index...')
+  //   console.log(currentIdx)
+  //   setCurrIndex(currentIdx)
+   
+  //   //dispatch(setCurrentIdx(currIndex));
+    
+
+
+  // }, [currIndex]);
+
+
   useEffect(() => {
-    if (currIndex + 1 > imgDataList.length) {
-      setCurrIndex(0)
-    }
-  }, [currIndex, imgDataList.length]);
+
+    console.log('currentIdx index...')
+    console.log(currentIdx)
+    setCurrIndex(currentIdx)
+    console.log('imgLabelData')
+    console.log(imgLabelData)
+   
+    //dispatch(setCurrentIdx(currIndex));
+    
+
+
+  }, [currentIdx]);
+
 
 
 
@@ -375,7 +436,8 @@ function Dataset(props: DatasetPropsType) {
         </div>
         :
         <></>
-      }
+      } 
+
     </>
   );
 }

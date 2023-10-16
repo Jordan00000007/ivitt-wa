@@ -14,7 +14,7 @@ export const APILog = (props: LogContentProps) => {
 
   useEffect(() => {
     if (dummy.current) {
-      dummy.current.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      dummy.current.scrollIntoView({ block: 'end' });
     }
   }, [logData]);
 

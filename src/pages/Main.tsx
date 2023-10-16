@@ -19,6 +19,7 @@ import { setSocketIdAction } from '../redux/store/slice/socketId';
 import { ClassListType } from '../component/Select/CreateSearchSelect';
 import { useGetCurrTrainInfo } from './model/hook/useModelData';
 import { selectProjectData } from '../redux/store/slice/projectData';
+import AutoLabel from '../pages/autoLabel';
 
 
 export type selectCardClassType = {
@@ -29,6 +30,10 @@ export type MainPropsType = {
   handleInitData: (data: GetAllProjectsType) => void;
 };
 
+type MousePositionType = {
+  x: 0,
+  y: 0
+};
 
 export const MainContext = createContext<{
   activeClassName: string;
@@ -59,10 +64,11 @@ function Main(props: MainPropsType) {
   const trainData = useSelector(selectCurrentTrainInfo).currTrain;
   const projectData = useSelector(selectProjectData).projectData;
   const { id: datasetId = '', type: dataType = '' } = useParams();
-  const { combinedClass, projectIterList, datasetInfoApiCallback } = useFetchIterationInfo(datasetId);
+  const { combinedClass, datasetInfoApiCallback } = useFetchIterationInfo(datasetId);
   const { lastIter, getIterListCallback } = useGetIterationList(datasetId);
   const { getCurrTrainingInfo } = useGetCurrTrainInfo();
   const [activeClassName, setActiveClassName] = useState('All');
+
 
   const handelSidebarList = (projectData: AllProjectDataType) => {
     let filteredList = [''];
@@ -86,13 +92,13 @@ function Main(props: MainPropsType) {
 
   useEffect(() => {
     //在這邊設redux 讓switchBtnGroup can disable model
-    if (projectIterList.length > 0) {
+    if (handelSidebarList(projectData).length > 0) {
       dispatch(setHasIteration(true));
     } else {
       //沒加的話刪掉最後一個iter會判斷錯誤
       dispatch(setHasIteration(false));
     }
-  }, [dispatch, projectIterList.length]);
+  }, [dispatch, projectData]);
 
 
 
@@ -145,28 +151,50 @@ function Main(props: MainPropsType) {
         currentTab={currentTab}
       />
 
-      <ProjectContainer noOverFlow={true}>
-        <MainWrapper>
-          <AlertMessage />
-          <Loading />
-          <Breadcrumb
-            className={currentTab === 'Label' ? 'hide' : ''}
-            breadcrumbs={datasetBreadcrumbs}
-            onHrefUpdate={(href: string) => { navigate(href); }}
-          />
-          {currentTab === 'Dataset' || currentTab === 'Label' ?
-            <Dataset
+
+      {currentTab === 'Dataset' || currentTab === 'Model' ?
+        <ProjectContainer noOverFlow={true}>
+          <MainWrapper>
+            <AlertMessage />
+            <Loading />
+            <Breadcrumb
+              className={''}
+              breadcrumbs={datasetBreadcrumbs}
+              onHrefUpdate={(href: string) => { navigate(href); }}
+            />
+            {currentTab === 'Dataset' ?
+              <Dataset
+                handleInitData={handleInitData}
+                datasetInfoApiCallback={datasetInfoApiCallback}
+                getIterListCallback={getIterListCallback} />
+              :
+              <></>
+            }
+            {/* {currentTab === 'Label' ?
+             <AutoLabel></AutoLabel>
+            : <></>} */}
+            {currentTab === 'Model' ?
+              <Model datasetInfoApiCallback={datasetInfoApiCallback} lastIter={lastIter} />
+              : <></>}
+          </MainWrapper>
+        </ProjectContainer>
+        :
+        <></>
+      }
+      {currentTab === 'Label' ?
+        <>
+         <Loading />
+          <AutoLabel
               handleInitData={handleInitData}
               datasetInfoApiCallback={datasetInfoApiCallback}
-              getIterListCallback={getIterListCallback} />
-            :
-            <></>
-          }
-          {currentTab === 'Model' ?
-            <Model datasetInfoApiCallback={datasetInfoApiCallback} lastIter={lastIter} />
-            : <></>}
-        </MainWrapper>
-      </ProjectContainer>
+              getIterListCallback={getIterListCallback}
+            ></AutoLabel>
+        </>
+        
+        :
+        <></>
+      }
+
     </MainContext.Provider>
   );
 }

@@ -59,6 +59,7 @@ export type NewRecStartType = {
 export type CursorType = {
   isActive: boolean,
   cursorNW: 'sw-resize' | 'nw-resize' | '',
+  //cursorNW:  '',
   drawing: boolean;
 };
 
@@ -478,7 +479,6 @@ const EditCanvas = (props: CanvasProps) => {
 
     if (targetIcon === 'draw' && tempRec.bbox.x > 0) {
       if (!tempRec.bbox.x1 || !tempRec.bbox.y1) return;
-      if (tempRec.bbox.x === tempRec.bbox.x1 || tempRec.bbox.y === tempRec.bbox.y1) return;
       //push to current array
       boxes.push(tempRec);
 

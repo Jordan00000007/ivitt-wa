@@ -13,13 +13,14 @@ type PhotoFrameProps = {
   setSelectPhotoList: (data: React.SetStateAction<any[]>) => void;
   currIndex: number;
   handleImgClick: (e: any) => void;
+  handleImgDoubleClick: (e: any) => void;
   idSelectMap: IdSelectMapType;
   openDeleteTab: boolean;
 };
 
 
 const PhotoFrameItem = (props: PhotoFrameProps) => {
-  const { openDeleteTab, hoveredIndex, value, currIndex, selectPhotoList, setSelectPhotoList, handleImgClick, idSelectMap } = props;
+  const { openDeleteTab, hoveredIndex, value, currIndex, selectPhotoList, setSelectPhotoList, handleImgClick,handleImgDoubleClick, idSelectMap } = props;
   const [hoverPhoto, setHoverPhoto] = useState<boolean>(false);
   const currentIter = useSelector(selectIteration).iteration;
   const hoverIndex = useRef<any | null>(null);
@@ -78,6 +79,7 @@ const PhotoFrameItem = (props: PhotoFrameProps) => {
           onMouseOver={() => onMouseOver(hoveredIndex)}
           className={idSelectMap[hoveredIndex] ? 'addBlur' : ''}
           onClick={(e: any) => handleImgClick(e)}
+          onDoubleClick={(e: any) => handleImgDoubleClick(e)}
         >
           <ButtonWrap
             show={openDeleteTab}
@@ -93,6 +95,7 @@ const PhotoFrameItem = (props: PhotoFrameProps) => {
         <PhotoFrame key={hoveredIndex} id={String(hoveredIndex)}
           active={hoveredIndex === currIndex}
           onClick={(e: any) => handleImgClick(e)}
+          onDoubleClick={(e: any) => handleImgDoubleClick(e)}
         >
           <Photo src={`${apiHost}/display_img/${value.url}`} alt={`${value.name}`} loading="lazy" />
         </PhotoFrame >

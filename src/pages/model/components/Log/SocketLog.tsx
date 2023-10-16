@@ -14,10 +14,9 @@ export const SocketLog = (props: LogContentProps) => {
   const [shortLog, setShortLog] = useState<string[]>(socketLog);
 
 
-
   useEffect(() => {
     if (dummy.current) {
-      dummy.current.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      dummy.current.scrollIntoView({ block: 'end' });
     }
   }, [socketLog]);
 

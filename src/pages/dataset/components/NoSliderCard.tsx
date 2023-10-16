@@ -40,7 +40,7 @@ const NoSliderCard = (props: NoSliderCardProps) => {
         active={activeClassName === 'All'}
         activeClassName={'All'}
         onClick={() => setActiveClassName('All')}
-        disabled={activeClassName !== 'All' && disableBtn}
+        disabled={activeClassName !== 'Unlabeled' && disableBtn}
       />
       {countNumber.unlabeled > 0 ?
         <DatasetSelectBtn
@@ -50,7 +50,6 @@ const NoSliderCard = (props: NoSliderCardProps) => {
           active={activeClassName === 'Unlabeled'}
           activeClassName={'Unlabeled'}
           onClick={() => setActiveClassName('Unlabeled')}
-          disabled={activeClassName !== 'Unlabeled' && disableBtn}
         /> : null
       }
 

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useDropzone, FileWithPath } from "react-dropzone";
 import UploadFileItem, { isFileTypeCorrect } from "../UploadFileItem/UploadFileItem";
-import { DropContainer, CustomIcon, Description, CustomSpan, FileItemContainer } from "./uploadZoneStyle";
+import { DropContainer, CustomIcon, Description, CustomSpan, FileItemContainer, Note } from "./uploadZoneStyle";
 import { UploadableFile } from "../Dialogs/UploadDialog";
 import { deleteDatasetImgAPI, uploadDatasetImgAPI } from "../../constant/API";
 import { useDispatch, useSelector } from "react-redux";
@@ -276,6 +276,7 @@ const UploadZone = (props: UploadZoneProps) => {
           <Description>Drag & drop your files or
             <CustomSpan onClick={open}>browse</CustomSpan>
           </Description>
+          <Note>Supported formats: 'jpg', 'jpeg', 'png', 'bmp'.</Note>
         </DropContainer>
         :
         <FileItemContainer

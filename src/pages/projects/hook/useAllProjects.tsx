@@ -53,7 +53,7 @@ export const useAllProjectInit = (path: string) => {
 
 
   useEffect(() => {
-    //如果在dataset重整會有init順序問題，導致錯誤，所以只有在allProjects才直接呼叫
+    //如果在dataset重整會有init順序問題，導致錯誤，所以只有在allProjects才呼叫
     dispatch(openLoading());
     if (path.includes('allProjects')) {
       getAllProjectsAPI()

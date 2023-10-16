@@ -60,6 +60,7 @@ type SliderCardProps = {
   setActiveClassName: (data: string) => void;
   currentClass: selectCardClassType;
   setCurrentClass: (data: selectCardClassType) => void;
+  // iterationInfoList: IterationInfo[];
   setImgDataList: (data: string[]) => void;
   cardNumberLength: number;
 };
@@ -137,6 +138,7 @@ const SliderCard = (props: SliderCardProps) => {
     }
   }
 
+
   useEffect(() => {
     //分成兩個useEffect的話，新upload的圖片不會更新
     handelSelectCardList(projectData, currentIter)
@@ -148,6 +150,14 @@ const SliderCard = (props: SliderCardProps) => {
       iteration: currentIter,
       class_name: activeClassName
     }
+
+    console.log('--- try get image info url ---')
+    console.log('--- currentIter ---')
+    console.log(currentIter)
+    console.log('--- activeClassName ---')
+    console.log(activeClassName)
+
+
     getImgUrlList(datasetId, reqData).then((data) => {
       if (data) setImgDataList(data);
     })
@@ -155,16 +165,23 @@ const SliderCard = (props: SliderCardProps) => {
   }, [activeClassName, currentIter, currentTab, datasetId, handelSelectCardList, projectData, setImgDataList]);
 
   useEffect(() => {
-    if (currentIter !== 'workspace') return;
     //如果是All就不用做後續處理
     if (activeClassName === 'All' || currentTab !== 'Dataset') return;
 
     if (activeClassName === 'Unlabeled' && workspaceInfo) {
       if (workspaceInfo.Unlabeled === 0) setActiveClassName('All');
+    } else {
+      //如果把bbox清掉，又同時刪除class
+      if (workspaceInfo && workspaceInfo.sortClass.indexOf(activeClassName) === -1) setActiveClassName('All');
     }
 
-  }, [activeClassName, currentIter, currentTab, setActiveClassName, workspaceInfo]);
+  }, [activeClassName, currentTab, setActiveClassName, workspaceInfo]);
 
+
+  // const SliderLayer = useMemo(() => {
+  //   if (cardNumberLength < 3) return <Slider {...settings} />;
+  //   return <></>;
+  // }, [cardNumberLength, settings])
 
 
   if (cardNumberLength < 3) return (

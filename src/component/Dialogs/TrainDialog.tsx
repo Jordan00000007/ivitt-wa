@@ -278,7 +278,7 @@ const TrainDialog = (props: AddDialogProps) => {
   return (
     <Dialog open={open} handleClose={() => { }} {...restProps}>
       <Title>Train</Title>
-      <form id='TrainDialog' onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <SelectMenu labelName={'Method of Training'} name={'trainMethod'} value={trainMethod} menuItemArray={trainMethodList} handleChange={handleMethodChange} error={errorItem.trainMethod} />
         {trainMethod === 'Advanced Training' ?
           <>

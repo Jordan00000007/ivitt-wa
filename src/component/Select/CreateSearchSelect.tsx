@@ -101,19 +101,55 @@ export default function CreateSearchSelect(props: CreateSearchSelectType) {
   const handelAddClass = useCallback((newClass: string) => {
     //是在labelPage才直接打addClass API+拉資料
     if (labelPage) {
+
+      console.log('--- add class countColorId ---')
+      console.log(countColorId)
+
       addClassAPICallback(newClass, countColorId)
         .then((res) => {
           if (res && datasetInfoApiCallback !== undefined) {
+            console.log('--- add class ---')
+            console.log(newClass)
+            console.log('--- response ---')
+            console.log(res)
             datasetInfoApiCallback(id, true);
             dispatch(setLastColorIdAction(String(countColorId)))
           }
         })
     } else {
       if (hasUploadFile) {
-        addClassAPICallback(newClass, Number(countColorId));
+        console.log('--- hasUploadFile ---')
+        console.log(newClass)
+        console.log(Number(countColorId))
+        addClassAPICallback(newClass, Number(countColorId))
+        .then((res) => {
+          if (res && datasetInfoApiCallback !== undefined) {
+            console.log('--- add class ---')
+            console.log(newClass)
+            console.log('--- response ---')
+            console.log(res)
+            datasetInfoApiCallback(id, true);
+            dispatch(setLastColorIdAction(String(countColorId)))
+          }
+        })
+
+        //addClassAPICallback(newClass, Number(countColorId));
         dispatch(setLastColorIdAction(String(countColorId)))
 
       } else {
+
+        addClassAPICallback(newClass, Number(countColorId))
+        .then((res) => {
+          if (res && datasetInfoApiCallback !== undefined) {
+            console.log('--- add class ---')
+            console.log(newClass)
+            console.log('--- response ---')
+            console.log(res)
+            datasetInfoApiCallback(id, true);
+            dispatch(setLastColorIdAction(String(countColorId)))
+          }
+        })
+
         dispatch(setLastColorIdAction(String(countColorId)))
         updateList(newClass, countColorId)
       }

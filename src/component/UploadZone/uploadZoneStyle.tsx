@@ -77,6 +77,13 @@ export const Description = styled.div`
   height: 24px;
 `
 
+export const Note = styled.div`
+  margin-top: 4px;
+  font-size: ${props => props.theme.typography.body1};
+  color: #979CB5;
+  height: 24px;
+`
+
 export const CustomSpan = styled.label`
   display: inline-block; 
   margin-left: 6px;

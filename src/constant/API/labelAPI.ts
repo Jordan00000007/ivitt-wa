@@ -35,6 +35,45 @@ export type  ResGetColorBarAPIType = {
 
 export const getColorBarAPI = () => axios.get<ResGetColorBarAPIType>(APIPath.label.getColorBar);
 
+export type  ResFavoriteLabelType = {
+    [key: string]: {
+        color_id: number,
+        class_name: string,
+        class_color: string, //有些資料不需要
+      }
+};
+
+export type  ResFavoriteLabelAPIType = {
+    status: number,
+    message: string,
+    data: ResFavoriteLabelType
+};
+
+//export const favoriteLabelAPI = () => axios.get<ResFavoriteLabelAPIType>(APIPath.label.favoriteLabel(Id));
+
+export const favoriteLabelAPI = (Id: string) => 
+axios.get<ResFavoriteLabelAPIType>(APIPath.label.favoriteLabel(Id));
+
+export type  ResIterationItemType = {
+    [key: string]: {
+        mAP: number,
+        class: number,
+    }
+};
+
+export type  ResIterationType = {
+    [key: string] : ResIterationItemType[]
+};
+
+export type  ResIterationAPIType = {
+    status: number,
+    message: string,
+    data: ResIterationType
+};
+
+export const getIterationAPI = (Id: string) => 
+axios.get<ResIterationAPIType>(APIPath.label.getIteration(Id));
+
 
 export type  AddClassType = {
     class_name: string,
@@ -44,6 +83,51 @@ export type  AddClassType = {
 export const addClassAPI = (Id: string, info: AddClassType) => 
 axios.post<ResType>(APIPath.label.addClass(Id), info);
 
+export type  AutoLabelingParameterType = {
+    iteration: string,
+    threshold:number
+};
+
+export const modifyAutoLabelingParameterAPI = (Id: string, info: AutoLabelingParameterType) => 
+axios.put<ResType>(APIPath.label.autolabeling(Id), info);
+
+export const getAutoLabelingParameterAPI = (Id: string) => 
+axios.get<ResType>(APIPath.label.autolabeling(Id));
+
+export const openAutoLabelingAPI = (Id: string, info: AutoLabelingParameterType) => 
+axios.post<ResType>(APIPath.label.autolabeling(Id), info);
+
+export type  InferAutoLabelingParameterType = {
+    img_name: string
+};
+
+export const inferAutoLabelingAPI = (Id: string, info: InferAutoLabelingParameterType) => 
+axios.post<ResType>(APIPath.label.inferAutolabeling(Id), info);
+
+export type  ThresholdParameterType = {
+    threshold: number,
+    img_name: string,
+};
+
+export const thresholdAPI = (Id: string, info: ThresholdParameterType) => 
+axios.post<ResType>(APIPath.label.threshold(Id), info);
+
+export type  ConfrimStatusParameterType = {
+    image_name: string
+};
+
+export const confirmStatusAPI = (Id: string, info: ConfrimStatusParameterType) => 
+axios.post<ResType>(APIPath.label.confirmStatus(Id), info);
+
+export type  AutoLabelStatusParameterType = {
+};
+
+export const setAutolabelStatusAPI = (Id: string, info: AutoLabelStatusParameterType) => 
+axios.post<ResType>(APIPath.label.autolabelStatus(Id), info);
+
+export const getAutolabelStatusAPI = (Id: string) => 
+axios.get<ResType>(APIPath.label.autolabelStatus(Id));
+
 
 export const deleteClassAPI = (Id: string, class_name: string) => 
 axios.delete(APIPath.label.deleteClass(Id), {
@@ -51,6 +135,15 @@ data: {
   class_name,
 }
 });
+
+export type  ChangeClassType = {
+    class_name: string,
+    color_id:number,
+    color_hex:string,
+};
+
+export const classChangeColorAPI = (Id: string, info: ChangeClassType) => 
+axios.post<ResType>(APIPath.label.classChangeColor(Id), info);
 
 
 export type  RenameClassType = {

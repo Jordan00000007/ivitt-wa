@@ -21,6 +21,7 @@ import { FixedSizeList as List } from 'react-window';
 import styled from 'styled-components';
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
 import { selectProjectData } from "../../redux/store/slice/projectData";
+import log from "../../utils/console";
 
 export const StyledList = styled(List)`
   &.hideBar{
@@ -242,7 +243,52 @@ function LabelPage(props: LabelPropsType) {
   useEffect(() => {
     listRef.current.scrollToItem(currIndex, 'start');
     // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    log('--- currIndex ---')
+    log(currIndex)
+
+    log('--- datasetId ---')
+    log(datasetId)
+
+    log('--- dataType ---')
+    log(dataType)
+
+    log('--- projectData ---')
+    log(projectData)
+
+    log('--- img data ---')
+    log(imgDataList[currIndex])
+    log(`${apiHost}/display_img/${imgDataList[currIndex]}`)
+
+    log('-- currPath ---')
+    log(currPath)
+
+    log('-- currentClass ---')
+    log(currentClass)
+
+    log('-- imgInfo ---')
+    log(imgInfo)
+
+    log('-- combinedClass ---')
+    log(combinedClass)
+
+    log('-- annotationList ---')
+    log(annotationList)
+
+
+
+    
+   
+
   }, [])
+
+  useEffect(() => {
+   
+    log('-- boxInfo ---')
+    log(boxInfo)
+    
+
+  }, [boxInfo])
 
 
   return (
@@ -254,7 +300,7 @@ function LabelPage(props: LabelPropsType) {
       }}
     >
       <div style={{ display: tab === 'Label' ? '' : 'none' }}>
-        <Title style={{ position: 'relative' }}>Label
+        <Title style={{ position: 'relative' }}>Label_xxx
           <StyledBtnOutline onClick={() => {
             dispatch(setCurrentTab("Dataset"));
             setSearchValue(null)
@@ -330,6 +376,17 @@ function LabelPage(props: LabelPropsType) {
                   ref={listRef}
                 >
                   {({ index, style, data }) => {
+
+                    log('--- index ---')
+                    log(index)
+
+                    log('--- style ---')
+                    log(style)
+
+                    log('--- data ---')
+                    log(data)
+
+
                     return (
                       <div
                         key={index}
@@ -338,6 +395,7 @@ function LabelPage(props: LabelPropsType) {
                         <PhotosFrame key={index} id={String(index)} active={imgDataList[index] === imgDataList[currIndex]} onClick={(e) => handleImgClick(e)} >
                           <Photo src={`${apiHost}/display_img/${imgDataList[index]}`} />
                         </PhotosFrame>
+                       
                       </div>
                     );
                   }}

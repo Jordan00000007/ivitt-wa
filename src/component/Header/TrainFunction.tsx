@@ -25,22 +25,11 @@ export const TrainBtnWrapperDiv = styled.div`
 display: flex;
 align-items: center;
 justify-content: flex-end;
-width: 662px;
+width: 658px;
 height: 56px;
 
-
-  @media(max-height: 850px) and (min-width: 1366px){
-    width: 650px;
-  }
-
-  @media(min-height: 850px){
-    width: 660px;
-  }
-
-  @media(max-width: 1320px){
-  min-width:fit-content;
-  margin-left: 12px;
-  width: 100px;
+@media(max-width: 1024px){
+  width: 316px;
   }
 `;
 
@@ -86,9 +75,9 @@ const TrainFunction = (props: TagProps) => {
 
   const checkTrainCondition = useCallback(
     (classNumber: selectCardClassType) => {
-      const belowFifteen = Object.values(classNumber).filter((value) => { return Number(value) < 15 })
-
-      if (Object.values(classNumber).length > 0 && belowFifteen.length === 0 && iterLengthPass) {
+      const overFifteen = Object.keys(classNumber).map((theClass) => classNumber[theClass] >= 15);
+      const checkIfPass = overFifteen.every(value => value === true);
+      if (overFifteen.length > 0 && checkIfPass && iterLengthPass) {
         return true;
       } else {
         return false;
@@ -145,6 +134,8 @@ const TrainFunction = (props: TagProps) => {
           }}
         /> : null
       }
+
+
     </>
   );
 };

@@ -1,15 +1,16 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from "react-router";
 import logo from "../../images/iVIT-T Logo_W.png";
 import Marquee from "react-fast-marquee";
 import { selectIdTitle } from "../../redux/store/slice/currentTitle";
 import SwitchButtonGroup from '../Buttons/SwitchButtonGroup';
-import { useSelector } from "react-redux";
+
 import { GetAllProjectsType } from '../../constant/API';
-import { AlignWrapper, Container, FullTitle, FullTitleWrapper, HeaderContent, Logo, MarqueeTitle, Title, TitleWrapper } from './headerStyle';
+import { AlignWrapper, Container, ContainerLabel, FullTitle, FullTitleLabel, FullTitleWrapper, FullTitleWrapperLabel, HeaderContent,HeaderContentLabel, Logo, LogoLabel, MarqueeTitle, Title, TitleWrapper, BackButton } from './headerStyle';
 import TrainFunction from './TrainFunction';
-import { selectCurrentTab } from '../../redux/store/slice/currentTab';
+import { selectCurrentTab,setCurrentTab } from '../../redux/store/slice/currentTab';
 import { selectSocketId } from '../../redux/store/slice/socketId';
 
 type HeaderProps = {
@@ -29,6 +30,7 @@ const Header = (props: HeaderProps) => {
   const currentTab = useSelector(selectCurrentTab).tab;
   const socketId = useSelector(selectSocketId).socketId;
 
+  const dispatch = useDispatch();
 
   // 偵測title是否overflow
   const isOverflowActive = useCallback((event: HTMLDivElement | null) => {
@@ -36,6 +38,8 @@ const Header = (props: HeaderProps) => {
       return event.offsetWidth < event.scrollWidth;
     }
   }, []);
+
+
 
 
   const titleGenerate = (showMarquee: boolean) => {
@@ -74,13 +78,16 @@ const Header = (props: HeaderProps) => {
           </TitleWrapper>
           <AlignWrapper>
             <SwitchButtonGroup />
-            <TrainFunction key={socketId} handleInitData={handleInitData} />
           </AlignWrapper>
+          <TrainFunction key={socketId} handleInitData={handleInitData} />
         </div>
-        <div style={{ display: currentTab === 'Label' ? '' : 'none' }}>
-          <FullTitleWrapper>
-            <FullTitle>{title}</FullTitle>
-          </FullTitleWrapper>
+        <div style={{ display: currentTab === 'Label' ? '' : 'none',position:'relative' }}>
+          <div style={{position:'absolute',left:-138,top:-25,backgroundColor:'#E61F23',paddingLeft:10}}>
+            <FullTitleWrapperLabel>
+              <FullTitleLabel>{title}</FullTitleLabel>
+            </FullTitleWrapperLabel>
+          </div>
+          
         </div>
       </>
     )
@@ -96,16 +103,34 @@ const Header = (props: HeaderProps) => {
     }
   }, [allIdTitle, socketId, pathname, theType]);
 
-  return (
-    <>
-      <Container>
-        <HeaderContent >
-          <Logo onClick={() => { navigator('/allProjects'); }} src={logo} />
-          {switchTitle(detectCurrentStyle(pathname))}
-        </HeaderContent>
-      </Container>
-    </>
-  );
+  if (currentTab === 'Model' || currentTab === 'Dataset')
+    return (
+      <>
+        <Container>
+          <HeaderContent >
+            <Logo onClick={() => { navigator('/allProjects'); }} src={logo} />
+            {switchTitle(detectCurrentStyle(pathname))}
+          </HeaderContent>
+        </Container>
+      </>
+    );
+
+  else
+    return (
+      <>
+        <ContainerLabel>
+          <HeaderContentLabel >
+            <LogoLabel onClick={() => { navigator('/allProjects'); }} src={logo} />
+            {switchTitle(detectCurrentStyle(pathname))}
+           
+          </HeaderContentLabel>
+          <div style={{position:'relative'}}>
+            <BackButton onClick={()=>dispatch(setCurrentTab('Dataset'))}>Back</BackButton> 
+          </div>
+          
+        </ContainerLabel>
+      </>
+    )
 };
 
 export default Header;

@@ -36,7 +36,7 @@ export const LogBlock = (props: LogContentProps) => {
 
   const checkLogInit = useCallback(() => {
     if (!isCurrTrain && Object.keys(logData).length > 0) {
-      return <APILog logData={logData} dataType={dataType} />
+      return <APILog logData={logData.data} dataType={dataType} />
     } else {
       return (
         <SocketLog key={datasetId.concat(currentIter)} ws={ws} />
@@ -62,9 +62,16 @@ export const LogBlock = (props: LogContentProps) => {
 
 
   return (
-    <Block style={{ borderRight: 0 }}>
-      <SubTitle>Log</SubTitle>
-      {checkLogInit()}
-    </Block>
+    <>
+
+      <Block style={{ borderRight: 0 }}>
+        <SubTitle>Log</SubTitle>
+
+        {checkLogInit()}
+
+      </Block>
+
+    </>
+
   );
 };

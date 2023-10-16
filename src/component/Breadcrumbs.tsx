@@ -6,6 +6,7 @@ import { Fragment } from 'react';
 const BreadcrumbsContainer = styled.div`
   width: 100%;
   color: ${(props) => props.theme.color.onColor_2};
+  
 
   &.hide{
     display: none;

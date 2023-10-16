@@ -2,12 +2,15 @@
 // export const apiHost = `http://${host}/ivit`;
 // export const socketHost = `http://${host}`;
 
+// export const apiHost = `http://172.16.92.124:6550`;
+// export const socketHost = `${apiHost}`;
+
 export const apiHost = `http://192.168.8.134:6530`;
 export const socketHost = `${apiHost}`;
 
-// export const apiHost = `${process.env.FRONTEND_DEV_SERVER}/ivit`;
-// export const socketHost = `${process.env.FRONTEND_DEV_SERVER}`;
-// set FRONTEND_DEV_SERVER='http://172.16.92.124:6550' && 
+//http://10.204.16.134:6538/allProjects
+
+
 
 
 const APIPath = {
@@ -38,6 +41,15 @@ const APIPath = {
     getBbox: (Id: string) => `${apiHost}/${Id}/get_bbox`,
     updateBbox: (Id: string) => `${apiHost}/${Id}/update_bbox`,
     editImgClass: (Id: string) => `${apiHost}/${Id}/edit_img_class`,
+    classChangeColor: (Id: string) => `${apiHost}/${Id}/class_change_color`,
+    favoriteLabel: (Id: string) => `${apiHost}/${Id}/favorite_label`,
+    getIteration: (Id: string) => `${apiHost}/${Id}/get_iteration`,
+    autolabeling: (Id: string) => `${apiHost}/${Id}/autolabeling`,
+    inferAutolabeling: (Id: string) => `${apiHost}/${Id}/autolabeling/infer`,
+    threshold: (Id: string) => `${apiHost}/${Id}/threshold`,
+    confirmStatus: (Id: string) => `${apiHost}/${Id}/confirm_status`,
+    autolabelStatus: (Id: string) => `${apiHost}/${Id}/autolabel_status`,
+    
   },
   model:{
     getMetrics: (Id: string) => `${apiHost}/${Id}/metrics_history`,

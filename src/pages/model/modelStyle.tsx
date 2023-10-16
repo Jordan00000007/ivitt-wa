@@ -50,6 +50,10 @@ export const SpanWrapper = styled.div`
   overflow-x: hidden;
 
 
+  /* &:hover{
+    overflow: auto;
+  } */
+
    /* width */
   *::-webkit-scrollbar,
   &::-webkit-scrollbar {

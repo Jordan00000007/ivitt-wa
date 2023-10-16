@@ -58,11 +58,11 @@ type UploadFileItemProps = {
 
 export function isFileTypeCorrect(file: File, projectType: string) {
   if (projectType === 'classification') {
-    let allowedExtensions = /(\.jpg|\.jpeg|\.png|\.bmp)$/i;
+    let allowedExtensions = /(\.jpg|\.jpeg|\.png|\.bmp|\.tif|\.tiff)$/i;
     if (allowedExtensions.exec(file.name)) return true;
     else return false;
   } else {
-    let allowedExtensions = /(\.jpg|\.jpeg|\.png|\.bmp|\.txt)$/i;
+    let allowedExtensions = /(\.jpg|\.jpeg|\.png|\.bmp|\.txt|\.tif|\.tiff)$/i;
     if (allowedExtensions.exec(file.name)) return true;
     else return false;
   }

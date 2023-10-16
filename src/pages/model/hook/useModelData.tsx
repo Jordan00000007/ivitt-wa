@@ -173,7 +173,7 @@ export const useAPICurveAndLog = (
       .then(({ data }) => {
         curveRef.current = true;
         const status = Object.keys(data.data).map((v) => data.data[v].status)
-        setLogData(data.data);
+        setLogData(data);
         setCurveData(status)
       })
       .catch((err) => {

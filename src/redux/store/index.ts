@@ -5,6 +5,9 @@ import loadingReducer from "./slice/loading"
 import selectedClassReducer from "./slice/selectedClass"
 import currentIterationReducer from "./slice/currentIteration"
 import currentTabReducer from "./slice/currentTab"
+import currentIdxReducer from "./slice/currentIdx"
+import currentBboxReducer from "./slice/currentBbox"
+import currentClassInfoReducer from "./slice/currentClassInfo"
 import hasIterationReducer from './slice/hasIteration'
 import projectPlatformReducer from './slice/projectPlatform'
 // import currentClassAndNumberReducer from "./slice/currentClassAndNumber";
@@ -24,6 +27,9 @@ export const store =  configureStore({
     selectedClass: selectedClassReducer,
     currentIteration:currentIterationReducer,
     currentTab:currentTabReducer,
+    currentIdx:currentIdxReducer,
+    currentBbox:currentBboxReducer,
+    currentClassInfo:currentClassInfoReducer,
     hasIteration:hasIterationReducer,
     projectPlatform: projectPlatformReducer,
     // currentClassAndNumber: currentClassAndNumberReducer,

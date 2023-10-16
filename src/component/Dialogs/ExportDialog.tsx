@@ -170,7 +170,7 @@ const ExportDialog = (props: ExportDialogProps) => {
   return (
     <Dialog open={open} handleClose={handleCancel} {...restProps}>
       <Title>Export model</Title>
-      <form id='ExportDialog' onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <SelectMenu labelName={'Platform *'} name={'platform'} value={exportForm.platform} menuItemArray={handlePlatformList()} handleChange={handleOnChange} />
         <SelectMenu error={errorItem} labelName={'Export to *'} name={'exportTo'} value={exportForm.exportTo} menuItemArray={exportToList} handleChange={handleOnChange}>
           {exportToList.includes('iCAP') ?

@@ -1,7 +1,7 @@
 import { ChangeEvent, useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { isFileTypeCorrect } from "../UploadFileItem/UploadFileItem";
-import { DropContainer, CustomIcon, Description, CustomSpan, FileItemContainer } from "./uploadZoneStyle";
+import { DropContainer, CustomIcon, Description, CustomSpan, FileItemContainer,Note } from "./uploadZoneStyle";
 import { UploadableFile } from "../Dialogs/UploadDialog";
 import UploadFolderItem from "../UploadFileItem/UploadFolderItem";
 import UploadSelectFolderItem from "../UploadFileItem/UploadSelectFolderItem";
@@ -180,6 +180,7 @@ const UploadZone = (props: UploadZoneProps) => {
               browse
             </CustomSpan>
           </Description>
+          <Note>Supported formats: 'jpg', 'jpeg', 'png', 'bmp'{(dataType==='classification')?"":", 'txt'"}.</Note>
         </DropContainer>
         :
         <FileItemContainer
