@@ -289,7 +289,7 @@ const CustomSelectClass = forwardRef((props, ref) => {
 
     const handleClassSelected = (myIndex) => {
 
-
+        log('handle Class Selected')
 
         log(myIndex)
         setDialogOrder(-1);
