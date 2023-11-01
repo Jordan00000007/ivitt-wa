@@ -1,83 +1,88 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { useSelector, useDispatch } from "react-redux";
 import Tooltip from '@mui/joy/Tooltip';
 import Box from '@mui/joy/Box';
 import Typography from '@mui/joy/Typography';
 import Chip from '@mui/joy/Chip';
 import { extendTheme, CssVarsProvider } from '@mui/joy/styles';
 
-const ClassTooltip = ({ children, title, keyword }) => {
+import { selectCurrentClassInfo } from "../../redux/store/slice/currentClassInfo";
 
-    const theme1 = extendTheme({
-        components: {
-            JoyTooltip: {
-                styleOverrides: {
-                    root: ({ ownerState, theme }) => ({
-                        borderColor: 'red',
-                        backgroundColor: '#FFD8D9',
-                        solidBg: 'green',
-                    }),
-                },
-            },
+const ClassTooltip = ({ children, title, keyword,expandClassMenu }) => {
 
-        },
-    });
+    const classInfo = useSelector(selectCurrentClassInfo).classInfo;
 
     return (
-        <CssVarsProvider theme={theme1}>
+         
+            ((classInfo.length===0)&&(!expandClassMenu)) ?
             <Tooltip
-                
-                title={
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            maxWidth: 210,
-                            justifyContent: 'center',
-                            p: 1,
-                        }}
+            variant="outlined"
+            title={
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        maxWidth: 206,
+                        justifyContent: 'center',
+                        p: 1,
+                    }}
+                >
+                    <Typography
+                        fontSize="18px"
+                        fontFamily="roboto"
+                        fontWeight="500"
+                        textColor="#16272E"
+
                     >
-                        <Typography
-                            fontSize="18px"
-                            fontFamily="roboto"
-                            fontWeight="500"
-                            textColor="#16272E"
+                        Create class
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1, width: '100%', mt: 1 }}>
 
-                        >
-                            Create class
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 1, width: '100%', mt: 1 }}>
+                        <div>
+                            <Typography fontSize="13px" fontFamily="roboto" >
+                                Get started by creating your first class.
+                            </Typography>
 
-                            <div>
-                                <Typography fontSize="13px" fontFamily="roboto" >
-                                This is a textarea to teach user how to create the first class. Hope this can be simple and clear.
-                                </Typography>
-                            
-                            </div>
-                        </Box>
+                        </div>
                     </Box>
-                }
+                </Box>
+            }
 
 
-                arrow
-                open
-                placement="bottom"
-                slotProps={{
-                    root: {
-                        sx: {
-                            backgroundColor: '#FFD8D9',
-                            padding: '10px 16px',
-                            borderRadius: 6,
-                            ml: -2,
-                            mt: 3
-
-
-                        },
+            arrow
+            open
+            placement="bottom"
+            
+            slotProps={{
+                root: {
+                    sx: {
+                        backgroundColor: '#FFD8D9',
+                        padding: '10px 16px',
+                        borderColor: '#16272E14',
+                        borderRadius: 6,
+                        offset: [50, 50],
+                        top : "5px !important"
+                    
                     },
-                }}
-            >
-                {children}
-            </Tooltip>
-        </CssVarsProvider>
+                },
+                arrow: {
+                    sx: {
+                     
+                        "&::before": {
+                            borderColor: "#FFD8D9", 
+                            boxShadow : '2px 2px #16272E14',
+                            '--unstable_Tooltip-arrowRotation': -1,
+                        },
+
+                    },
+                },
+            }}
+        >
+            {children}
+             </Tooltip>
+            :
+            <> {children}</>
+
     );
 };
 

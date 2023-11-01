@@ -80,9 +80,7 @@ export const getMediaSize=(canvasSize,imageSize)=>{
 
 export const getRboxFromBbox=(bbox,sizeInfo)=>{
 
-    log('-- bbox ---')
-    log(bbox)
-
+    
     const myData={};
     const ratioX=sizeInfo.mediaWidth/sizeInfo.imageWidth;
     const ratioY=sizeInfo.mediaHeight/sizeInfo.imageHeight;

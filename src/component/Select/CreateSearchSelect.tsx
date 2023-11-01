@@ -17,6 +17,7 @@ import { selectColorBar } from '../../redux/store/slice/colorBar';
 const StyledLabel = styled.label`
   font-size: ${props => props.theme.typography.body2};
   color: ${props => props.theme.color.onColor_2};
+  margin-bottom:10px;
 
   &.hide{
     display: none;
@@ -99,7 +100,7 @@ export default function CreateSearchSelect(props: CreateSearchSelectType) {
   const countColorId = lastColorId === '' ? 0 : Number(lastColorId) + 1;
 
   const handelAddClass = useCallback((newClass: string) => {
-    //是在labelPage才直接打addClass API+拉資料
+    console.log('是在labelPage才直接打addClass API+拉資料')
     if (labelPage) {
 
       console.log('--- add class countColorId ---')
@@ -122,36 +123,41 @@ export default function CreateSearchSelect(props: CreateSearchSelectType) {
         console.log(newClass)
         console.log(Number(countColorId))
         addClassAPICallback(newClass, Number(countColorId))
-        .then((res) => {
-          if (res && datasetInfoApiCallback !== undefined) {
-            console.log('--- add class ---')
-            console.log(newClass)
-            console.log('--- response ---')
-            console.log(res)
-            datasetInfoApiCallback(id, true);
-            dispatch(setLastColorIdAction(String(countColorId)))
-          }
-        })
+          .then((res) => {
+            if (res && datasetInfoApiCallback !== undefined) {
+              console.log('--- add class ---')
+              console.log(newClass)
+              console.log('--- response ---')
+              console.log(res)
+              datasetInfoApiCallback(id, true);
+              dispatch(setLastColorIdAction(String(countColorId)))
+            }
+          })
 
         //addClassAPICallback(newClass, Number(countColorId));
         dispatch(setLastColorIdAction(String(countColorId)))
 
       } else {
 
+        console.log('--- other else ---')
+        console.log(newClass)
+
+        console.log('countColorId',countColorId)
+
         addClassAPICallback(newClass, Number(countColorId))
-        .then((res) => {
-          if (res && datasetInfoApiCallback !== undefined) {
-            console.log('--- add class ---')
-            console.log(newClass)
-            console.log('--- response ---')
-            console.log(res)
-            datasetInfoApiCallback(id, true);
-            dispatch(setLastColorIdAction(String(countColorId)))
-          }
-        })
+          .then((res) => {
+            if (res && datasetInfoApiCallback !== undefined) {
+              console.log('--- add class ---')
+              console.log(newClass)
+              console.log('--- response ---')
+              console.log(res)
+              datasetInfoApiCallback(id, true);
+              dispatch(setLastColorIdAction(String(countColorId)))
+            }
+          })
 
         dispatch(setLastColorIdAction(String(countColorId)))
-        updateList(newClass, countColorId)
+        //updateList(newClass, countColorId)
       }
     }
   }, [addClassAPICallback, countColorId, datasetInfoApiCallback, dispatch, hasUploadFile, id, labelPage, updateList])
@@ -195,7 +201,7 @@ export default function CreateSearchSelect(props: CreateSearchSelectType) {
       imgInfo[cls] = [imgName];
       const postData = {
         images_info: imgInfo,
-        class_name: selectValue
+        class_name: selectValue,
       }
       editImgClassAPI(id, postData)
         .then(({ data }) => {
@@ -251,7 +257,12 @@ export default function CreateSearchSelect(props: CreateSearchSelectType) {
 
   return (
     <div style={{ height: '77px', marginBottom: '16px' }}>
+
+
+
       <StyledLabel className={hideLabel ? 'hide' : ''} htmlFor="explicit-label-name">Assign class</StyledLabel>
+
+      
       <Autocomplete
         value={searchValue}
         onChange={(event, newValue) => {
@@ -316,17 +327,26 @@ export default function CreateSearchSelect(props: CreateSearchSelectType) {
           }
           return <li {...props}>{option.name}</li>;
         }}
+        // sx={{
+        //   width: '100%', backgroundColor: '#fafafd'
+        // }}
+
         sx={{
-          width: '100%', backgroundColor: '#fafafd'
+          width: '100%', backgroundColor: 'transparent',border:'0px'
         }}
         freeSolo
         forcePopupIcon
         renderInput={(params) => (
-          <ThemeProvider theme={theme}>
-            <StyledTextField placeholder="-- Please select or type --" {...params} label="" />
-          </ThemeProvider>
+
+          
+              // <ThemeProvider theme={theme}>
+                <StyledTextField placeholder="-- Please select or type --" {...params} label="" variant="outlined" />
+              // </ThemeProvider>
+          
+
         )}
       />
+       
     </div>
   );
 }

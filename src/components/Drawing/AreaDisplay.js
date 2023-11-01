@@ -64,6 +64,7 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange, isHover, ai }) 
                 fill="transparent"
                 stroke={getClassColor(shapeProps.class_name)}
                 strokeWidth={isHover?7:4}
+                
                 draggable={false}
                 dash={[10,5]}
                 dashEnabled={ai}
@@ -74,6 +75,7 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange, isHover, ai }) 
                         y: e.target.y(),
                     });
                 }}
+              
                
             />
             
@@ -117,7 +119,7 @@ const AreaDisplay = forwardRef((props, ref) => {
                             draggable={false}
                             shadowBlur={5}
                             isSelected={rect.id === selectedId}
-                            isHover={(findIndex(props.hoverBbox, function(o) { return o===i; }))>=0}
+                            isHover={(findIndex(props.hoverBbox, function(o) { return o.replace('a','')===i+''; }))>=0}
                             ai={false}
                         />
                         
@@ -134,7 +136,7 @@ const AreaDisplay = forwardRef((props, ref) => {
                             draggable={false}
                             shadowBlur={5}
                             isSelected={rect.id === selectedId}
-                            isHover={(findIndex(props.hoverBbox, function(o) { return o===i; }))>=0}
+                            isHover={(findIndex(props.hoverBbox, function(o) { return o.replace('b','')===i+''; }))>=0}
                             ai={true}
                         />
                         

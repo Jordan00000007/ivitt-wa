@@ -9,7 +9,7 @@ import { apiHost } from '../../constant/API/APIPath';
 import { map, filter, cloneDeep, findIndex } from 'lodash-es';
 import moment from 'moment';
 
-import { selectCurrentBbox, setLabelIndex,setAiLabelIndex, setCurrentBbox,setAutoBox } from "../../redux/store/slice/currentBbox";
+import { selectCurrentBbox, setLabelIndex, setAiLabelIndex, setCurrentBbox, setAutoBox } from "../../redux/store/slice/currentBbox";
 import { selectCurrentClassInfo } from "../../redux/store/slice/currentClassInfo";
 
 import { updateBboxAPI } from '../../constant/API';
@@ -157,63 +157,65 @@ const Rectangle = forwardRef(({ shapeProps, isSelected, onSelect, mediaWidth, me
                 
                 onDragEnd={(e) => {
                     log('move end')
-
                     const node = shapeRef.current;
-                    const scaleX = node.scaleX();
-                    const scaleY = node.scaleY();
 
-                    // we will reset it back
-                    node.scaleX(1);
-                    node.scaleY(1);
+                    if (node !== null) {
 
-                    const rbox = {};
-                    rbox.x = node.x();
-                    rbox.y = node.y();
-                    rbox.width = Math.max(5, node.width() * scaleX);
-                    rbox.height = Math.max(node.height() * scaleY);
+                        const scaleX = node.scaleX();
+                        const scaleY = node.scaleY();
 
-                    const bbox = getBboxFromRbox(rbox, sizeInfo);
+                        // we will reset it back
+                        node.scaleX(1);
+                        node.scaleY(1);
+
+                        const rbox = {};
+                        rbox.x = node.x();
+                        rbox.y = node.y();
+                        rbox.width = Math.max(5, node.width() * scaleX);
+                        rbox.height = Math.max(node.height() * scaleY);
+
+                        const bbox = getBboxFromRbox(rbox, sizeInfo);
 
 
-                    if (labelIndex>=0){
-                        const newBbox = cloneDeep(currentBbox);
-                        log('newBbox')
-                        log(newBbox)
-                        newBbox[labelIndex].bbox = [bbox.x1, bbox.y1, bbox.x2, bbox.y2];
-    
-                        const myPayload = {};
-                        myPayload.image_name = imageName;
-                        myPayload.box_info = newBbox;
-                        myPayload.confirm=0;
-    
-                        dispatch(setCurrentBbox(newBbox));
-                        const lastLabelIndex = labelIndex;
-                        dispatch(setLabelIndex(-1))
-                        dispatch(setLabelIndex(lastLabelIndex))
-    
-                        updateBboxAPI(datasetId, myPayload)
-                            .then(({ status }) => {
-                                log('updateBboxAPI-res', status);
-    
-                            })
-                            .catch(({ response }) => {
-                                log('updateBboxAPI-Error', response.data);
-                            })
-    
-                        onBoxChange(newBbox);
-                    }else{
-                        const newBbox = cloneDeep(autoBox);
-                     
-                        newBbox[aiLabelIndex].bbox = [bbox.x1, bbox.y1, bbox.x2, bbox.y2];
-    
-                        dispatch(setAutoBox(newBbox));
-                        const lastLabelIndex = aiLabelIndex;
-                        dispatch(setAiLabelIndex(-1))
-                        dispatch(setAiLabelIndex(lastLabelIndex))
-    
-                        onBoxChange(newBbox);
+                        if (labelIndex >= 0) {
+                            const newBbox = cloneDeep(currentBbox);
+                            log('newBbox')
+                            log(newBbox)
+                            newBbox[labelIndex].bbox = [bbox.x1, bbox.y1, bbox.x2, bbox.y2];
+
+                            const myPayload = {};
+                            myPayload.image_name = imageName;
+                            myPayload.box_info = newBbox;
+                            myPayload.confirm = 0;
+
+                            dispatch(setCurrentBbox(newBbox));
+                            const lastLabelIndex = labelIndex;
+                            dispatch(setLabelIndex(-1))
+                            dispatch(setLabelIndex(lastLabelIndex))
+
+                            updateBboxAPI(datasetId, myPayload)
+                                .then(({ status }) => {
+                                    log('updateBboxAPI-res', status);
+
+                                })
+                                .catch(({ response }) => {
+                                    log('updateBboxAPI-Error', response.data);
+                                })
+
+                            onBoxChange(newBbox);
+                        } else {
+                            const newBbox = cloneDeep(autoBox);
+
+                            newBbox[aiLabelIndex].bbox = [bbox.x1, bbox.y1, bbox.x2, bbox.y2];
+
+                            dispatch(setAutoBox(newBbox));
+                            const lastLabelIndex = aiLabelIndex;
+                            dispatch(setAiLabelIndex(-1))
+                            dispatch(setAiLabelIndex(lastLabelIndex))
+
+                            onBoxChange(newBbox);
+                        }
                     }
-                   
 
                 }}
                 onTransformEnd={(e) => {
@@ -256,7 +258,7 @@ const Rectangle = forwardRef(({ shapeProps, isSelected, onSelect, mediaWidth, me
                     node.scaleY(1);
                     node.rotation(0);
 
-                    if (labelIndex>=0){
+                    if (labelIndex >= 0) {
 
                         const bbox = getBboxFromRbox(rbox, sizeInfo);
                         const newBbox = cloneDeep(currentBbox);
@@ -265,7 +267,7 @@ const Rectangle = forwardRef(({ shapeProps, isSelected, onSelect, mediaWidth, me
                         const myPayload = {};
                         myPayload.image_name = imageName;
                         myPayload.box_info = newBbox;
-                        myPayload.confirm=0;
+                        myPayload.confirm = 0;
 
                         dispatch(setCurrentBbox(newBbox));
                         const lastLabelIndex = labelIndex;
@@ -273,19 +275,19 @@ const Rectangle = forwardRef(({ shapeProps, isSelected, onSelect, mediaWidth, me
                         dispatch(setLabelIndex(lastLabelIndex))
 
                         updateBboxAPI(datasetId, myPayload)
-                        .then(({ status }) => {
-                            log('updateBboxAPI-res', status);
+                            .then(({ status }) => {
+                                log('updateBboxAPI-res', status);
 
-                        })
-                        .catch(({ response }) => {
-                            log('updateBboxAPI-Error', response.data);
-                        })
+                            })
+                            .catch(({ response }) => {
+                                log('updateBboxAPI-Error', response.data);
+                            })
 
                         onBoxChange(newBbox);
                     }
-                    else{
+                    else {
 
-                    
+
 
                         const bbox = getBboxFromRbox(rbox, sizeInfo);
                         const newBbox = cloneDeep(autoBox);
@@ -295,20 +297,23 @@ const Rectangle = forwardRef(({ shapeProps, isSelected, onSelect, mediaWidth, me
                         const lastAiLabelIndex = aiLabelIndex;
                         dispatch(setAiLabelIndex(-1))
                         dispatch(setAiLabelIndex(lastAiLabelIndex))
-     
+
                         onBoxChange(newBbox);
                     }
                 }}
-                // onMouseOver={event => {
-                //     const container = event.target.getStage().container();
-                //     container.style.cursor = 'move';
+                onMouseOver={event => {
+                    log('on mouse over...')
+                    // const container = event.target.getStage().container();
+                    // container.classList.remove('my-white-cursor');
+                    // container.classList.add('my-black-cursor');
 
-                // }}
-                // onMouseLeave={event => {
-                //     const container = event.target.getStage().container();
-                //     container.style.cursor = 'default';
+                }}
+                onMouseLeave={event => {
+                    // const container = event.target.getStage().container();
+                    // container.classList.remove('my-black-cursor');
+                    // container.classList.add('my-white-cursor');
 
-                // }}
+                }}
                 dragBoundFunc={(pos) => {
 
                     const node = shapeRef.current;
@@ -331,10 +336,10 @@ const Rectangle = forwardRef(({ shapeProps, isSelected, onSelect, mediaWidth, me
                 anchorCornerRadius={6}
                 anchorStrokeWidth={2}
                 anchorSize={11}
-                borderStrokeWidth={3}
+                
                 //shouldOverdrawWholeArea={false}
                 //rotateAnchorOffset={100}
-                borderDash={(aiLabelIndex>=0)?[10,5]:[]}
+                borderDash={(aiLabelIndex >= 0) ? [10, 5] : []}
                 borderStrokeWidth={isHover ? 7 : 4}
                 enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
                 boundBoxFunc={(oldBox, newBox) => {
@@ -401,6 +406,8 @@ const AreaEdit = forwardRef((props, ref) => {
     const [mediaWidth, setMediaWidth] = React.useState(1);
     const [mediaHeight, setMediaHeight] = React.useState(1);
 
+    const [tag, setTag] = React.useState('');
+
     const [editData, setEditData] = React.useState({});
 
     const dispatch = useDispatch();
@@ -411,7 +418,7 @@ const AreaEdit = forwardRef((props, ref) => {
     const autoBox = useSelector(selectCurrentBbox).autobox;
 
     const labelIndex = useSelector(selectCurrentBbox).labelIndex;
-   
+
     const aiLabelIndex = useSelector(selectCurrentBbox).aiLabelIndex;
 
     const sizeInfo = useSelector(selectCurrentBbox).sizeInfo;
@@ -420,46 +427,62 @@ const AreaEdit = forwardRef((props, ref) => {
 
         if (labelIndex >= 0) {
 
-            log(' ---------  ')
-            log(autoBox[aiLabelIndex])
-            log(' ---------  ')
-            log(currentBbox[labelIndex])
-
             if (labelIndex < currentBbox.length) {
                 setEditData(getRboxFromBbox(currentBbox[labelIndex], sizeInfo))
-                log(getRboxFromBbox(currentBbox[labelIndex], sizeInfo))
             }
             setMediaWidth(sizeInfo.mediaWidth);
             setMediaHeight(sizeInfo.mediaHeight)
+            setTag('a'+labelIndex);
 
 
         } else if (aiLabelIndex >= 0) {
 
             if (aiLabelIndex < autoBox.length) {
-
-                log(' 1---------  ')
-                log(autoBox[aiLabelIndex])
-                log(' 2---------  ')
-                log(getRboxFromBbox(autoBox[aiLabelIndex], sizeInfo))
-
                 setEditData(getRboxFromBbox(autoBox[aiLabelIndex], sizeInfo))
-                
-            } 
+            }
             setMediaWidth(sizeInfo.mediaWidth);
-            setMediaHeight(sizeInfo.mediaHeight)
+            setMediaHeight(sizeInfo.mediaHeight);
+            setTag('b'+aiLabelIndex);
 
 
         } else {
-            setEditData({})
+            setEditData({});
+            setTag('');
         }
 
 
     }, [labelIndex, aiLabelIndex]);
 
-    
+
+    useEffect(() => {
+
+        if (labelIndex >= 0) {
+            if (labelIndex < currentBbox.length) {
+                setEditData(getRboxFromBbox(currentBbox[labelIndex], sizeInfo))
+            }
+            setMediaWidth(sizeInfo.mediaWidth);
+            setMediaHeight(sizeInfo.mediaHeight)
+        }
+
+    }, [currentBbox]);
+
+    useEffect(() => {
+
+        if (aiLabelIndex >= 0) {
+            if (aiLabelIndex < autoBox.length) {
+                setEditData(getRboxFromBbox(autoBox[aiLabelIndex], sizeInfo));
+            }
+            setMediaWidth(sizeInfo.mediaWidth);
+            setMediaHeight(sizeInfo.mediaHeight);
+        }
+
+    }, [autoBox]);
 
 
-    
+
+
+
+
 
     return (
         <>
@@ -471,7 +494,7 @@ const AreaEdit = forwardRef((props, ref) => {
                 shapeProps={editData}
                 ref={RectangleRef}
                 onBoxChange={props.onBoxChange}
-                isHover={(findIndex(props.hoverBbox, function (o) { return o === labelIndex; })) >= 0}
+                isHover={(findIndex(props.hoverBbox, function (o) { return o === tag; })) >= 0}
             />
 
 

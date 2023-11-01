@@ -54,6 +54,8 @@ export type  ResFavoriteLabelAPIType = {
 export const favoriteLabelAPI = (Id: string) => 
 axios.get<ResFavoriteLabelAPIType>(APIPath.label.favoriteLabel(Id));
 
+export const clearAutolabelingAPI = (Id: string) => axios.get<ResType>(APIPath.label.clearAutolabeling(Id));
+
 export type  ResIterationItemType = {
     [key: string]: {
         mAP: number,
@@ -77,7 +79,8 @@ axios.get<ResIterationAPIType>(APIPath.label.getIteration(Id));
 
 export type  AddClassType = {
     class_name: string,
-    color_id:number
+    color_id:number,
+    color_hex: string,
 };
 
 export const addClassAPI = (Id: string, info: AddClassType) => 
@@ -184,7 +187,7 @@ export type  ResBBoxAPIType = {
 };
 
 
-export const getBboxAPI = (Id: string, info: GetBBoxType) => axios.post<ResBBoxAPIType>(APIPath.label.getBbox(Id), info);
+export const getBboxAPI = async (Id: string, info: GetBBoxType) => axios.post<ResBBoxAPIType>(APIPath.label.getBbox(Id), info);
 
 
 export type  UpdateBBoxInfoType = {

@@ -242,11 +242,41 @@ export const useGetIterationList = (datasetId: string) => {
   const getIterListCallback = useCallback(() => {
     getIterListAPI(datasetId)
       .then(({ data }) => {
+
         const theLastOne = data.data.folder_name.length - 1;
-        setLastIter(data.data.folder_name[theLastOne]);
+
+        if (data.data.folder_name[theLastOne]===undefined){
+          setLastIter(data.data.folder_name[theLastOne]);
+          
+        }else{
+          const theKey=Object.keys(data.data.folder_name[theLastOne])[0];
+          if (theKey==='0'){
+            setLastIter(data.data.folder_name[theLastOne]);
+          
+          }else{
+            setLastIter(theKey);
+           
+          }
+         
+         
+        }
+
+        
         if (data.data.folder_name.length <= 20) setIterLengthPass(true);
       })
       .catch(({ response }) => console.log('getIterListAPI-Error', response.data))
+
+
+    // getIterListAPI(datasetId)
+    //   .then(({ data }) => {
+    //     const theLastOne = data.data.folder_name.length - 1;
+
+    //     console.log('data.data.folder_name[theLastOne]',data.data.folder_name[theLastOne])
+
+    //     setLastIter(data.data.folder_name[theLastOne]);
+    //     if (data.data.folder_name.length <= 20) setIterLengthPass(true);
+    //   })
+    //   .catch(({ response }) => console.log('getIterListAPI-Error', response.data))
   }, [datasetId]);
 
 

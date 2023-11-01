@@ -11,7 +11,7 @@ import { selectIteration } from "../../redux/store/slice/currentIteration"
 import ProjectTag from '../../component/ProjectTag';
 import { MainContext } from '../Main';
 import { selectCurrentTab, setCurrentTab } from '../../redux/store/slice/currentTab';
-import { selectCurrentIdx,setCurrentIdx } from '../../redux/store/slice/currentIdx';
+import { selectCurrentIdx, setCurrentIdx } from '../../redux/store/slice/currentIdx';
 
 import LabelPage from '../label/LabelPage';
 import { ClassListType } from '../../component/Select/CreateSearchSelect';
@@ -81,24 +81,19 @@ function Dataset(props: DatasetPropsType) {
   }, []);
 
   const handleImgClick = (e: MouseEvent<HTMLDivElement>) => {
-    console.log('image one click')
-    console.log(Number(e.currentTarget.id));
-    console.log('========================')
+   
     //setCurrIndex(Number(e.currentTarget.id));
     dispatch(setCurrentIdx(Number(e.currentTarget.id)));
   };
 
   const handleImgDoubleClick = (e: MouseEvent<HTMLDivElement>) => {
 
-    console.log('image double click')
-    console.log(Number(e.currentTarget.id));
-    console.log('========================')
+    if (currentIter === 'workspace') {
+      setCurrIndex(Number(e.currentTarget.id));
+      dispatch(setCurrentIdx(Number(e.currentTarget.id)));
+      dispatch(setCurrentTab('Label'));
+    }
 
-
-    setCurrIndex(Number(e.currentTarget.id));
-    
-    dispatch(setCurrentIdx(Number(e.currentTarget.id)));
-    dispatch(setCurrentTab('Label'));
   };
 
   const selectImgTotal = useMemo(() => {
@@ -247,7 +242,7 @@ function Dataset(props: DatasetPropsType) {
   const confirmInitData = useCallback((imgDataList: string[]) => {
     if (!workspaceInfo) return null;
     //workspaceInfo.sortClass.length === 0 因為有可能是有其他class只是數量都是0
-    
+
     if (currentIter === 'workspace' && workspaceInfo && workspaceInfo.All === 0 && workspaceInfo.sortClass.length === 0) {
       return (
         <EmptyWrapper style={{ minHeight: 'calc(100vh - 150px)' }}>
@@ -340,9 +335,9 @@ function Dataset(props: DatasetPropsType) {
   //   console.log('current index...')
   //   console.log(currentIdx)
   //   setCurrIndex(currentIdx)
-   
+
   //   //dispatch(setCurrentIdx(currIndex));
-    
+
 
 
   // }, [currIndex]);
@@ -350,14 +345,12 @@ function Dataset(props: DatasetPropsType) {
 
   useEffect(() => {
 
-    console.log('currentIdx index...')
-    console.log(currentIdx)
-    setCurrIndex(currentIdx)
-    console.log('imgLabelData')
-    console.log(imgLabelData)
    
-    //dispatch(setCurrentIdx(currIndex));
+    setCurrIndex(currentIdx)
     
+
+    //dispatch(setCurrentIdx(currIndex));
+
 
 
   }, [currentIdx]);
@@ -436,7 +429,7 @@ function Dataset(props: DatasetPropsType) {
         </div>
         :
         <></>
-      } 
+      }
 
     </>
   );

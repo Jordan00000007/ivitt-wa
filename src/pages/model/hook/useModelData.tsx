@@ -82,6 +82,9 @@ export const useAPIModelInit = (
     const sameIter = { iteration: currentIter };
     const theLastIter = { iteration: lastIter };
 
+    console.log('currentIter===>',currentIter)
+    console.log('theLastIter===>',theLastIter)
+
     getModelInfoAPI(datasetId, currentIter === 'workspace' ? theLastIter : sameIter)
       .then(({ data }) => {
         infoRef.current = true;

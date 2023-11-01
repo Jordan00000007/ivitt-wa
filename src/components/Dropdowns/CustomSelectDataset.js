@@ -17,7 +17,7 @@ import FavoriteBorder from '@mui/icons-material/FavoriteBorder';
 
 
 import { selectCurrentClassInfo, setClassInfo } from "../../redux/store/slice/currentClassInfo";
-
+import { selectCurrentIdx, setCurrentIdx, setImgDataList, setImgBoxList, setDataSetList, updateBoxInfo } from "../../redux/store/slice/currentIdx";
 
 const CustomSelectDataset = forwardRef((props, ref) => {
 
@@ -48,10 +48,10 @@ const CustomSelectDataset = forwardRef((props, ref) => {
     });
 
     const [placeHolder, setPlaceHolder] = useState(props.placeHolder);
-    const [selectedValue, setSelectedValue] = useState(-1);
+    const [selectedValue, setSelectedValue] = useState('');
     const [focus, setFocus] = useState(false);
 
-    const [classSelectorArr,setClassSelectorArr] =useState([[-1, 'All'],[-2, 'Unlabeled']])
+    const [classSelectorArr,setClassSelectorArr] =useState([['All', 'All'],['Unlabeled', 'Unlabeled']])
 
     const classInfo = useSelector(selectCurrentClassInfo).classInfo;
 
@@ -61,7 +61,11 @@ const CustomSelectDataset = forwardRef((props, ref) => {
         log(`${props.name} select change => ${value}`);
         
         setSelectedValue(value);
-        props.onChange(value);
+        if (value!==null){
+            
+            props.onChange(value);
+        }
+        
 
     };
 
@@ -86,7 +90,7 @@ const CustomSelectDataset = forwardRef((props, ref) => {
 
     useEffect(() => {
 
-        if ((props.defaultValue !== '')&&(selectedValue==='')) {
+        if ((props.defaultValue !== '')&&(selectedValue===null)) {
             setSelectedValue(props.defaultValue);
         }
 
@@ -94,12 +98,12 @@ const CustomSelectDataset = forwardRef((props, ref) => {
 
     useEffect(() => {
 
-        const myClassSelectorArr = [[-1, 'All'],[-2, 'Unlabeled']];
+        const myClassSelectorArr = [['All', 'All'],['Unlabeled', 'Unlabeled']];
       
         if (classInfo.length>0){
             classInfo.forEach((item) => {
                 const myClassItem = []
-                myClassItem.push(item.class_id);
+                myClassItem.push(item.class_name);
                 myClassItem.push(item.class_name);
                 myClassSelectorArr.push(myClassItem);
             })
@@ -109,6 +113,13 @@ const CustomSelectDataset = forwardRef((props, ref) => {
       
 
     }, [classInfo]);
+
+    useEffect(() => {
+
+       log('props.defaultValue',props.defaultValue)
+       log('selectedValue',selectedValue)
+
+    }, [props]);
 
 
   

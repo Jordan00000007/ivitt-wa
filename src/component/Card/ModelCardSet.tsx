@@ -28,9 +28,9 @@ const ModelCardSet = (props: ModelCardSetProps) => {
 
   return (
     <>
-      <ModelCard title={'Precision'} value={roundNumber(metrics.precision)} barColor={'vivid_1'}></ModelCard>
-      <ModelCard title={'Recall'} value={roundNumber(metrics.recall)} barColor={'vivid_2'}></ModelCard>
-      <ModelCard title={getOtherKey(metrics).titleName} value={getOtherKey(metrics).keyValue} barColor={'vivid_3'}></ModelCard>
+      <ModelCard title={'Precision'} value={roundNumber(metrics.precision)} barColor={'vivid_1'} hint="Measuring the reliability of the model predictions."></ModelCard>
+      <ModelCard title={'Recall'} value={roundNumber(metrics.recall)} barColor={'vivid_2'} hint="Assessing whether the model has successfully learned the features of each category."></ModelCard>
+      <ModelCard title={getOtherKey(metrics).titleName} value={getOtherKey(metrics).keyValue} barColor={'vivid_3'} hint="Evaluating accuracy of the predicted bounding boxes."></ModelCard>
     </>
   );
 };

@@ -1,7 +1,13 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import OutlinedFlagRoundedIcon from '@mui/icons-material/OutlinedFlagRounded';
 import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+import { faCircleQuestion } from '@fortawesome/free-regular-svg-icons';
+import CardStyledToolTip from '../CardToolTip';
 
 
 
@@ -33,6 +39,7 @@ const DataCardTitle = styled.div`
   font-weight: 500;
   font-size: ${props => props.theme.typography.body2};
   color: ${props => props.theme.color.onColor_2};
+  
 `;
 
 const Data = styled.div`
@@ -73,15 +80,41 @@ type DataCardProps = {
   title: string;
   value: number;
   barColor: string;
+  hint:string;
 };
 
 const ModelCard = (props: DataCardProps) => {
 
-  const { title, value, barColor } = props;
+  const { title, value, barColor,hint } = props;
+
+  const [open, setOpen] = useState(false);
+
+
   return (
     <>
       <Card>
-        <DataCardTitle>{title}
+        <DataCardTitle>
+          <div className='my-card-title' onMouseOver={()=>setOpen(true)} onMouseLeave={()=>{setOpen(false)}}>
+             {title}
+             <CardStyledToolTip place='top' title={hint} open={open}
+                PopperProps={{
+                  modifiers: [
+                    {
+                      name: "offset",
+                      options: {
+                        offset: [0, -4],
+                      }
+                      
+                    },
+                  ],
+                  //backgroundColor: 'rgba(0, 0, 0, 0.87)',
+                  className:'my-index-tooltip'
+                }}
+              >
+              <FontAwesomeIcon icon={faCircleQuestion} style={{marginLeft:3}}/>
+            </CardStyledToolTip>
+          </div>
+         
           <IconConvert title={title} />
         </DataCardTitle>
         <Data>{value}%</Data>

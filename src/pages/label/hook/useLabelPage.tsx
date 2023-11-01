@@ -57,6 +57,7 @@ export const useDraw = (imgInfo: ImageWHProps, boxData: BBoxInfoType[], combined
     for (let boxIndex in boxData) {
       const bbox = boxData[boxIndex].bbox;
       const colorId = boxData[boxIndex].color_id
+      const class_name = boxData[boxIndex].class_name
       ctx.strokeStyle = colorBar[colorId];
 
       if (imgInfo && boxData.length > 0) {
@@ -68,6 +69,8 @@ export const useDraw = (imgInfo: ImageWHProps, boxData: BBoxInfoType[], combined
         }, bbox)
 
         ctx.strokeRect(bboxData.x, bboxData.y, bboxData.width, bboxData.height);
+        // ctx.font = "25px roboto";
+        // ctx.strokeText(class_name, bboxData.x+6, bboxData.y+24);
         drawDataArr.push({ x: bboxData.x, y: bboxData.y, w: bboxData.width, h: bboxData.height })
       }
     }
@@ -108,7 +111,7 @@ export const useAddNewClass = (datasetId: string, classList: ClassListType[]) =>
   }, [classList, dispatch])
 
   const addClassAPICallback = useCallback((theNewClass: string, colorId: number) => {
-    return addClassAPI(datasetId, { class_name: theNewClass, color_id: colorId })
+    return addClassAPI(datasetId, { class_name: theNewClass, color_id: colorId, color_hex:'' })
       .then((res) => {
         if (res.status === 200) {
           updateList(theNewClass, colorId)

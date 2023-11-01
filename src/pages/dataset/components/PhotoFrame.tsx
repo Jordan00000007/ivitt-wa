@@ -95,7 +95,7 @@ const PhotoFrameItem = (props: PhotoFrameProps) => {
         <PhotoFrame key={hoveredIndex} id={String(hoveredIndex)}
           active={hoveredIndex === currIndex}
           onClick={(e: any) => handleImgClick(e)}
-          onDoubleClick={(e: any) => handleImgDoubleClick(e)}
+         
         >
           <Photo src={`${apiHost}/display_img/${value.url}`} alt={`${value.name}`} loading="lazy" />
         </PhotoFrame >

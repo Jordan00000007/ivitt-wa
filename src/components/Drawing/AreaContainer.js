@@ -8,17 +8,15 @@ import { Circle, Rect, Layer, Line, Stage, Image, Label, Text, Tag, Group, Dragg
 import Konva from 'konva';
 import useImage from "use-image";
 import { apiHost } from '../../constant/API/APIPath';
-import { updateBboxAPI, getBboxAPI,favoriteLabelAPI } from '../../constant/API';
+import { updateBboxAPI, getBboxAPI, favoriteLabelAPI } from '../../constant/API';
 import { map, find, filter, includes, remove, cloneDeep } from 'lodash-es';
 
 import AreaDisplay from '../Drawing/AreaDisplay';
 import AreaEdit from '../Drawing/AreaEdit';
 
 import { MainContext } from '../../pages/Main';
-import { selectCurrentBbox, setCurrentBbox, setSizeInfo, setLabelIndex,setAiLabelIndex, setImageName } from '../../redux/store/slice/currentBbox';
-import { selectCurrentClassInfo,setClassSelectedIndex,setFavLabels } from "../../redux/store/slice/currentClassInfo";
-
-
+import { selectCurrentBbox, setCurrentBbox, setSizeInfo, setLabelIndex, setAiLabelIndex, setImageName } from '../../redux/store/slice/currentBbox';
+import { selectCurrentClassInfo, setClassSelectedIndex, setFavLabels } from "../../redux/store/slice/currentClassInfo";
 
 
 const AreaContainer = forwardRef((props, ref) => {
@@ -26,9 +24,9 @@ const AreaContainer = forwardRef((props, ref) => {
 
     const [currentSize, setCurrentSize] = React.useState({ "width": 0, "height": 0 });
 
-    const [hoverBbox,setHoverBbox] = React.useState([]);
+    const [hoverBbox, setHoverBbox] = React.useState([]);
 
-    const { datasetId,dataType } = React.useContext(MainContext);
+    const { datasetId, dataType } = React.useContext(MainContext);
 
     const sizeInfo = useSelector(selectCurrentBbox).sizeInfo;
     const currentBbox = useSelector(selectCurrentBbox).bbox;
@@ -39,10 +37,11 @@ const AreaContainer = forwardRef((props, ref) => {
 
     const classInfo = useSelector(selectCurrentClassInfo).classInfo;
     const classSelectedIndex = useSelector(selectCurrentClassInfo).classSelectedIndex;
-    
 
 
-    const [image] = useImage(`${apiHost}/display_img/${props.areaData.img_path.replace("./", "/")}`);
+
+
+    const [image] = useImage((props.areaData.img_path) ? `${apiHost}/display_img/${props.areaData.img_path.replace("./", "/")}` : '');
 
     const dispatch = useDispatch();
 
@@ -67,26 +66,20 @@ const AreaContainer = forwardRef((props, ref) => {
             myPoint.x = myX;
             myPoint.y = myY;
             if (checkPointInRect(myPoint, item.bbox, sizeInfo)) {
-                result.push('a'+idx);
+                result.push('a' + idx);
             }
         });
 
-      
+
         autoBox.forEach((item, idx) => {
 
             const myPoint = {};
             myPoint.x = myX;
             myPoint.y = myY;
             if (checkPointInRect(myPoint, item.bbox, sizeInfo)) {
-                result.push('b'+idx);
+                result.push('b' + idx);
             }
         });
-
-        // log('result1')
-        // log(result1)
-        // log('result2')
-        // log(result2)
-
 
         return result;
     }
@@ -94,8 +87,9 @@ const AreaContainer = forwardRef((props, ref) => {
     const handleLayerClick = (e) => {
 
         log('layer click')
+       // window.document.body.classList.add('my-black-cursor')
 
-        if (props.toolSelect){
+        if ((props.toolSelect) && (dataType === 'object_detection')) {
 
             setNewAnnotation([]);
 
@@ -103,73 +97,104 @@ const AreaContainer = forwardRef((props, ref) => {
             const sy = e.evt.offsetY;
 
             const areaResult = checkAreaIntersect(sx, sy);
-           
+
             log('areaResult')
             log(areaResult)
 
-            if ((areaResult.length)===0){
+            //const container = stageRef.current.container();
+
+            const container = e.target.getStage().container();
+
+
+            if ((areaResult.length) === 0) {
+                
+                container.className='my-white-cursor';
+            }else{
+                
+                container.className='my-black-cursor';
+            }
+
+           
+
+            if ((areaResult.length) === 0) {
                 dispatch(setLabelIndex(-1));
                 dispatch(setAiLabelIndex(-1));
+
             }
-            else if ((areaResult.length)===1){
+            else if ((areaResult.length) === 1) {
 
-                if (areaResult[0].indexOf('a') >=0) {
+                if (areaResult[0].indexOf('a') >= 0) {
 
-                    const myIdx=parseInt(areaResult[0].replace('a',''));
+                    const myIdx = parseInt(areaResult[0].replace('a', ''));
                     dispatch(setLabelIndex(myIdx));
                     dispatch(setAiLabelIndex(-1));
                 }
-                if (areaResult[0].indexOf('b') >=0) {
+                if (areaResult[0].indexOf('b') >= 0) {
 
-                    const myIdx=parseInt(areaResult[0].replace('b',''));
+                    const myIdx = parseInt(areaResult[0].replace('b', ''));
                     dispatch(setLabelIndex(-1));
                     dispatch(setAiLabelIndex(myIdx));
                 }
 
-            }
-            else if ((areaResult.length)>1){
+              
 
-                if ((labelIndex===-1)&&(aiLabelIndex===-1)){
-                    if (areaResult[0].indexOf('a') >=0){
-                        const myIdx=parseInt(areaResult[0].replace('a',''));
+            }
+            else if ((areaResult.length) > 1) {
+
+                if ((labelIndex === -1) && (aiLabelIndex === -1)) {
+                    if (areaResult[0].indexOf('a') >= 0) {
+                        const myIdx = parseInt(areaResult[0].replace('a', ''));
                         dispatch(setLabelIndex(myIdx));
                         dispatch(setAiLabelIndex(-1));
                     }
-                    if (areaResult[0].indexOf('b') >=0){
-                        const myIdx=parseInt(areaResult[0].replace('b',''));
+                    if (areaResult[0].indexOf('b') >= 0) {
+                        const myIdx = parseInt(areaResult[0].replace('b', ''));
                         dispatch(setLabelIndex(-1));
                         dispatch(setAiLabelIndex(myIdx));
                     }
-                }else{
-                    let currentIndex='';
-                    if (labelIndex>=0) currentIndex='a'+labelIndex;
-                    if (aiLabelIndex>=0) currentIndex='b'+aiLabelIndex;
-                    const arrayIndex=areaResult.indexOf(currentIndex);
-                    let nextIndex=-1;
-                    if (arrayIndex<(areaResult.length-1)){
-                        nextIndex=arrayIndex+1;
-                    }else{
-                        nextIndex=0;
+                } else {
+                    let currentIndex = '';
+                    if (labelIndex >= 0) currentIndex = 'a' + labelIndex;
+                    if (aiLabelIndex >= 0) currentIndex = 'b' + aiLabelIndex;
+                    const arrayIndex = areaResult.indexOf(currentIndex);
+                    let nextIndex = -1;
+                    if (arrayIndex < (areaResult.length - 1)) {
+                        nextIndex = arrayIndex + 1;
+                    } else {
+                        nextIndex = 0;
                     }
-                    if (areaResult[nextIndex].indexOf('a') >=0){
-                        const myIdx=parseInt(areaResult[nextIndex].replace('a',''));
+                    if (areaResult[nextIndex].indexOf('a') >= 0) {
+                        const myIdx = parseInt(areaResult[nextIndex].replace('a', ''));
                         dispatch(setLabelIndex(myIdx));
                         dispatch(setAiLabelIndex(-1));
                     }
-                    if (areaResult[nextIndex].indexOf('b') >=0){
-                        const myIdx=parseInt(areaResult[nextIndex].replace('b',''));
+                    if (areaResult[nextIndex].indexOf('b') >= 0) {
+                        const myIdx = parseInt(areaResult[nextIndex].replace('b', ''));
                         dispatch(setLabelIndex(-1));
                         dispatch(setAiLabelIndex(myIdx));
                     }
                 }
 
-                
-
+               
             }
 
-           
+
         }
 
+    }
+
+    const handleLayerMouseDown = (e) => {
+
+        //window.document.body.classList.remove('my-white-cursor');
+        window.document.body.classList.add('my-black-cursor');
+      
+    }
+
+    const handleLayerMouseUp = (e) => {
+
+        //window.document.body.classList.add('my-white-cursor');
+        window.document.body.classList.remove('my-black-cursor');
+      
     }
 
 
@@ -179,8 +204,6 @@ const AreaContainer = forwardRef((props, ref) => {
         const imageSize = {};
         imageSize.width = props.areaData.img_shape[1];
         imageSize.height = props.areaData.img_shape[0];
-
-       
 
         const canvasSize = {};
         canvasSize.width = props.width;
@@ -199,24 +222,29 @@ const AreaContainer = forwardRef((props, ref) => {
 
         dispatch(setCurrentBbox(props.areaData.box_info));
         dispatch(setSizeInfo(sizeInfo));
-        dispatch(setImageName(props.areaData.img_path.slice(props.areaData.img_path.indexOf('//'))));
+
+        const myFileName = props.areaData.img_path.replace(/^.*[\/]/, '')
+
+        log('myFileName-------------->', myFileName)
+
+        dispatch(setImageName(myFileName));
         dispatch(setLabelIndex(-1));
         setCurrentSize(mediaSize);
 
-     
-       
+
+
 
     }, [props.areaData]);
 
     useEffect(() => {
 
-        
+
         const imageSize = {};
         imageSize.width = props.areaData.img_shape[1];
         imageSize.height = props.areaData.img_shape[0];
 
-        const canvasMinWidth=1456;
-        const canvasMinHeight=586;
+        const canvasMinWidth = 1456;
+        const canvasMinHeight = 586;
 
         const canvasSize = {};
         canvasSize.width = props.width;
@@ -233,45 +261,212 @@ const AreaContainer = forwardRef((props, ref) => {
         sizeInfo.mediaWidth = mediaSize.width;
         sizeInfo.mediaHeight = mediaSize.height;
 
-      
-        dispatch(setSizeInfo(sizeInfo));
-       
-        setCurrentSize(mediaSize);
-       
 
-    }, [props.height,props.width]);
+        dispatch(setSizeInfo(sizeInfo));
+
+        setCurrentSize(mediaSize);
+
+
+    }, [props.height, props.width]);
 
     const [annotations, setAnnotations] = useState([]);
     const [newAnnotation, setNewAnnotation] = useState([]);
 
-    const handleMouseDown = event => {
-        //log('handle mouse down')
-        if ((newAnnotation.length === 0)&&(labelIndex<0)&&(aiLabelIndex<0)&&(props.toolSelect)) {
-            const { x, y } = event.target.getStage().getPointerPosition();
-            setNewAnnotation([{ x, y, width: 0, height: 0, key: "newArea" }]);
+    const checkPointInside = (x, y) => {
+
+        let myCheck = false;
+        if ((x >= 1) && (y >= 1) && (x <= sizeInfo.mediaWidth - 1) && (y <= sizeInfo.mediaHeight - 1)) {
+            myCheck = true;
         }
+        log('myCheck', myCheck)
+        return myCheck;
+
+
+    }
+
+    const handleDrawingMouseUp = (event) => {
+
+        log('handle Outside Mouse Up');
+
+        const tx = event.x;
+        const ty = event.y;
+
+        const sx = event.currentTarget.sx;
+        const sy = event.currentTarget.sy;
+
+        const xx = event.currentTarget.xx;
+        const yy = event.currentTarget.yy;
+
+        const xxx = (tx - xx) + sx;
+        const yyy = (ty - yy) + sy;
+
+        const ex = (xxx <= 1) ? 1 : (xxx >= sizeInfo.mediaWidth - 1) ? sizeInfo.mediaWidth - 1 : xxx;
+        const ey = (yyy <= 1) ? 1 : (yyy >= sizeInfo.mediaHeight - 1) ? sizeInfo.mediaHeight - 1 : yyy;
+
+        log(sx, sy, ex, ey);
+
+        const annotationToAdd = {
+            x: Math.min(sx, ex),
+            y: Math.min(sy, ey),
+            width: Math.abs(sx - ex),
+            height: Math.abs(sy - ey),
+            key: annotations.length + 1
+        };
+
+        let checkAdd = true;
+        if ((annotationToAdd.width <= 5) && (annotationToAdd.height <= 5)) checkAdd = false;
+        if ((annotationToAdd.width === 0) || (annotationToAdd.height === 0)) checkAdd = false;
+
+
+        if (!checkAdd) {
+            setAnnotations([]);
+        } else {
+
+            annotations.push(annotationToAdd);
+            setNewAnnotation([]);
+            setAnnotations(annotations);
+
+            const newBox = {};
+            newBox.class_id = classInfo[classSelectedIndex].class_id;
+            newBox.class_name = classInfo[classSelectedIndex].class_name;
+            newBox.color_hex = classInfo[classSelectedIndex].color_hex;
+
+            const rbox = {};
+            rbox.x = Math.min(sx, ex);
+            rbox.y = Math.min(sy, ey);
+            rbox.width = Math.abs(sx - ex);
+            rbox.height = Math.abs(sy - ey);
+
+            const bbox = getBboxFromRbox(rbox, sizeInfo);
+            newBox.bbox = [bbox.x1, bbox.y1, bbox.x2, bbox.y2];
+
+            const myBoxInfo = cloneDeep(currentBbox);
+            myBoxInfo.push(newBox);
+
+            const myPayload = {};
+            myPayload.box_info = myBoxInfo;
+            myPayload.image_name = imageName.replace('//', '');
+            myPayload.confirm = props.confirmStatus;
+
+
+            dispatch(setCurrentBbox(myBoxInfo));
+            //dispatch(setLabelIndex(myBoxInfo.length - 1))
+            dispatch(setLabelIndex(-1))
+
+            updateBboxAPI(datasetId, myPayload)
+                .then(({ status }) => {
+                    log('updateBboxAPI-res', status);
+                    updateFavoriteLabel();
+                })
+                .catch(({ response }) => {
+                    log('updateBboxAPI-Error', response.data);
+                })
+            props.onBoxChange(myBoxInfo);
+
+            // }
+
+            setNewAnnotation([]);
+
+
+        }
+
+        document.removeEventListener('mouseup', handleDrawingMouseUp);
+        document.removeEventListener('mousemove', handleDrawingMouseMove);
+    }
+
+
+    const handleDrawingMouseMove = event => {
+
+        const tx = event.x;
+        const ty = event.y;
+
+        const sx = event.currentTarget.sx;
+        const sy = event.currentTarget.sy;
+
+        const xx = event.currentTarget.xx;
+        const yy = event.currentTarget.yy;
+
+        const xxx = (tx - xx) + sx;
+        const yyy = (ty - yy) + sy;
+
+        const ex = (xxx <= 1) ? 1 : (xxx >= sizeInfo.mediaWidth - 1) ? sizeInfo.mediaWidth - 1 : xxx;
+        const ey = (yyy <= 1) ? 1 : (yyy >= sizeInfo.mediaHeight - 1) ? sizeInfo.mediaHeight - 1 : yyy;
+
+        const rbox = {};
+        rbox.x = Math.min(sx, ex);
+        rbox.y = Math.min(sy, ey);
+        rbox.width = Math.abs(sx - ex);
+        rbox.height = Math.abs(sy - ey);
+        rbox.key = "0";
+
+        setNewAnnotation([rbox]);
+
     };
 
-    const handleMouseUp = event => {
-        
+    const handleMouseDown = event => {
 
-        //log('handle mouse up')
+       
+        
+        if ((newAnnotation.length === 0) && (labelIndex < 0) && (aiLabelIndex < 0) && (props.toolSelect) && (classSelectedIndex>=0)) {
+            const { x, y } = event.target.getStage().getPointerPosition();
+            setNewAnnotation([{ x, y, width: 0, height: 0, key: "newArea" }]);
+
+
+            document.addEventListener('mouseup', handleDrawingMouseUp);
+            document.sx = x;
+            document.sy = y;
+            document.xx = event.evt.x;
+            document.yy = event.evt.y;
+            document.addEventListener('mousemove', handleDrawingMouseMove);
+
+        }
+
+
+    };
+
+    const updateFavoriteLabel = () => {
+
+        favoriteLabelAPI(datasetId)
+            .then(({ data }) => {
+                const myData = data.data;
+                const myArr = [];
+                Object.keys(myData).forEach(function (k) {
+                    myArr.push(myData[k]);
+                });
+                dispatch(setFavLabels(myArr));
+            }).catch(({ response }) => {
+                dispatch(setFavLabels([]));
+                log(response.data.message);
+            });
+
+    }
+
+    const handleMouseUp = (event) => {
+
+        document.removeEventListener('mouseup', handleDrawingMouseUp);
+
+        log('(2) mouse up')
+        log(event)
+
+        //event.preventDefault();
+        //event.stopPropagation();
+        // event.preventDefault();
 
         if (newAnnotation.length === 1) {
             const sx = newAnnotation[0].x;
             const sy = newAnnotation[0].y;
             const { x, y } = event.target.getStage().getPointerPosition();
             const annotationToAdd = {
-                x: Math.min(sx,(x-sx)),
-                y: Math.min(sy,(y-sy)),
+                x: Math.min(sx, (x - sx)),
+                y: Math.min(sy, (y - sy)),
                 width: Math.abs(x - sx),
                 height: Math.abs(y - sy),
                 key: annotations.length + 1
             };
 
-            let checkAdd=true;
-            if ((annotationToAdd.width <=5) && (annotationToAdd.height <=5)) checkAdd=false;
-            if ((annotationToAdd.width === 0) || (annotationToAdd.height === 0)) checkAdd=false;
+            let checkAdd = true;
+            if ((annotationToAdd.width <= 5) && (annotationToAdd.height <= 5)) checkAdd = false;
+            if ((annotationToAdd.width === 0) || (annotationToAdd.height === 0)) checkAdd = false;
 
             if (!checkAdd) {
                 setAnnotations([]);
@@ -300,8 +495,8 @@ const AreaContainer = forwardRef((props, ref) => {
 
                 const myPayload = {};
                 myPayload.box_info = myBoxInfo;
-                myPayload.image_name = imageName.replace('//','');
-                myPayload.confirm=0;
+                myPayload.image_name = imageName.replace('//', '');
+                myPayload.confirm = props.confirmStatus;
 
 
                 dispatch(setCurrentBbox(myBoxInfo));
@@ -309,81 +504,55 @@ const AreaContainer = forwardRef((props, ref) => {
                 dispatch(setLabelIndex(-1))
 
                 updateBboxAPI(datasetId, myPayload)
-                .then(({ status }) => {
-                    log('updateBboxAPI-res', status);
-                    favoriteLabelAPI(datasetId)
-                    .then(({ data }) => {
-                        const myData=data.data;
-                        const myArr=[];
-                        Object.keys(myData).forEach(function(k){
-                            log(myData[k]);
-                            myArr.push(myData[k]);
-                        });      
-                        dispatch(setFavLabels(myArr));
-                    }).catch(({ response }) => {
-                        dispatch(setFavLabels([]));
-                        log(response.data.message);
-                    });
-                })
-                .catch(({ response }) => {
-                    log('updateBboxAPI-Error', response.data);
-                })
-
-
-              
-        
-
-                
+                    .then(({ status }) => {
+                        log('updateBboxAPI-res', status);
+                        updateFavoriteLabel();
+                    })
+                    .catch(({ response }) => {
+                        log('updateBboxAPI-Error', response.data);
+                    })
                 props.onBoxChange(myBoxInfo);
 
-
             }
-
-
-         
         }
+
+
     };
+
+
 
     const handleMouseMove = event => {
 
-        if (newAnnotation.length === 1) {
-
-            const sx = newAnnotation[0].x;
-            const sy = newAnnotation[0].y;
-            
-            const { x, y } = event.target.getStage().getPointerPosition();
-
-            const rbox = {};
-            rbox.x = sx;
-            rbox.y = sy;
-            rbox.width = x - sx;
-            rbox.height = y - sy;
-            rbox.key = "0";
-
-            setNewAnnotation([rbox]);
-
-        }else{
-
+        if (dataType === 'object_detection') {
             const sx = event.evt.offsetX;
             const sy = event.evt.offsetY;
-    
             const areaResult = checkAreaIntersect(sx, sy);
-            setHoverBbox(areaResult)
+            //log('areaResult --->',areaResult)
+            const container = event.target.getStage().container();
 
-        }
+            if ((areaResult.length) === 0) {
+                
+                container.className='my-white-cursor';
+            }else{
+                
+                container.className='my-black-cursor';
+            }
+
+            setHoverBbox(areaResult)
+        }        
     };
 
-    const handleMouseLeave = event => {
+    const handleMouseLeave_xx = event => {
 
         log('handle mouse leave')
-     
+
         if (newAnnotation.length === 1) {
 
             const bbox = getBboxFromRbox(newAnnotation[0], sizeInfo);
 
             const newBox = {};
             //newBox.class_id = classInfo[classSelectedIndex].class_id;
-            newBox.class_id = "";
+            newBox.class_id = classInfo[classSelectedIndex].class_id;
             newBox.class_name = classInfo[classSelectedIndex].class_name;
             newBox.color_hex = classInfo[classSelectedIndex].color_hex;
             newBox.bbox = [bbox.x1, bbox.y1, bbox.x2, bbox.y2];
@@ -394,6 +563,7 @@ const AreaContainer = forwardRef((props, ref) => {
             const myPayload = {};
             myPayload.box_info = myBoxInfo;
             myPayload.image_name = imageName;
+            myPayload.confirm = props.confirmStatus;
 
             log('my Box Info')
             log(myBoxInfo)
@@ -403,20 +573,44 @@ const AreaContainer = forwardRef((props, ref) => {
 
             dispatch(setCurrentBbox(myBoxInfo));
             dispatch(setLabelIndex(-1))
+
+            updateBboxAPI(datasetId, myPayload)
+                .then(({ status }) => {
+                    log('updateBboxAPI-res', status);
+                    updateFavoriteLabel();
+                })
+                .catch(({ response }) => {
+                    log('updateBboxAPI-Error', response.data);
+                })
+
+            props.onBoxChange(myPayload);
         }
         setNewAnnotation([]);
     }
 
+    const handleMouseLeave = event => {
+
+    }
+
     const annotationsToDraw = [...newAnnotation];
 
-   
+    const stageRef = useRef();
+
 
     useEffect(() => {
 
-        log('img url')
+        log('img url ----------------------->')
         log(`${apiHost}/display_img/${props.areaData.img_path.replace("./", "/")}`)
 
     }, []);
+
+    useEffect(() => {
+
+        if ((imageName !== '') && (dataType === 'object_detection')) {
+
+            setNewAnnotation([]);
+        }
+    }, [imageName]);
 
 
     return (
@@ -424,25 +618,28 @@ const AreaContainer = forwardRef((props, ref) => {
             width={currentSize.width}
             height={currentSize.height}
             onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
+            //onMouseUp={(evt) => { handleMouseUp(evt) }}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
+            ref={stageRef}
         >
-            <Layer onClick={handleLayerClick}>
+            <Layer onClick={handleLayerClick} 
+               
+            >
 
                 <Image image={image} width={currentSize.width} height={currentSize.height} />
 
                 {
-                    (dataType === 'object_detection')?
-                    <AreaDisplay currentBbox={currentBbox} hoverBbox={hoverBbox}></AreaDisplay>
-                    :
-                    <></>
+                    (dataType === 'object_detection') ?
+                        <AreaDisplay currentBbox={currentBbox} hoverBbox={hoverBbox}></AreaDisplay>
+                        :
+                        <></>
                 }
 
-                
+
                 {
-                    ((labelIndex >= 0)||(aiLabelIndex >= 0)) &&
-                    <AreaEdit onBoxChange={props.onBoxChange} hoverBbox={hoverBbox}></AreaEdit>
+                    ((labelIndex >= 0) || (aiLabelIndex >= 0)) &&
+                    <AreaEdit onBoxChange={props.onBoxChange} hoverBbox={hoverBbox} currentBbox={currentBbox} autoBoxbox={autoBox}></AreaEdit>
                 }
 
 
@@ -460,7 +657,7 @@ const AreaContainer = forwardRef((props, ref) => {
                                 height={value.height}
                                 //dash={[10, 5]}
                                 fill="transparent"
-                                stroke={(classInfo[classSelectedIndex]===undefined)?'#ff0000':classInfo[classSelectedIndex].color_hex}
+                                stroke={(classInfo[classSelectedIndex] === undefined) ? '#ff0000' : classInfo[classSelectedIndex].color_hex}
                                 strokeWidth={4}
                                 dragBoundFunc={(pos) => {
 

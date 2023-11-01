@@ -16,9 +16,12 @@ import CustomInput from '../../components/Inputs/CustomInput';
 import ClassEditPanel from '../../components/Panels/ClassEditPanel';
 import ColorfulPicker from '../../components/ColorPicker/ColorfulPicker';
 
-import { selectCurrentClassInfo, setClassEditingIndex, setClassSelectedIndex, setClassInfo, setClassInfoPrev } from "../../redux/store/slice/currentClassInfo";
+import { selectCurrentClassInfo, setClassEditingIndex, setClassSelectedIndex, setClassInfo, setClassInfoPrev,setFavLabels } from "../../redux/store/slice/currentClassInfo";
 import { MainContext } from '../../pages/Main';
-import { renameClassAPI, addClassAPI, toGetClassAndNumberAPI, classChangeColorAPI } from '../../constant/API';
+import { renameClassAPI, addClassAPI, toGetClassAndNumberAPI, classChangeColorAPI, editImgClassAPI, favoriteLabelAPI  } from '../../constant/API';
+import { selectCurrentBbox, setLabelIndex, setAiLabelIndex, setCurrentBbox, setAutoBox } from "../../redux/store/slice/currentBbox";
+
+import { selectCurrentIdx, setCurrentIdx } from "../../redux/store/slice/currentIdx";
 
 
 
@@ -42,11 +45,18 @@ const CustomSelectClass = forwardRef((props, ref) => {
 
     const [currentClassInput, setCurrentClassInput] = useState('');
 
+    const classEditPanelRef=useRef();
+
 
     const classInfo = useSelector(selectCurrentClassInfo).classInfo;
     const classInfoPrev = useSelector(selectCurrentClassInfo).classInfoPrev;
     const classEditingIndex = useSelector(selectCurrentClassInfo).classEditingIndex;
     const classSelectedIndex = useSelector(selectCurrentClassInfo).classSelectedIndex;
+
+    const currentBbox = useSelector(selectCurrentBbox).bbox;
+    const imageName = useSelector(selectCurrentBbox).imageName;
+
+    const currentIdx = useSelector(selectCurrentIdx).idx;
 
 
     const buttonRef = useRef(null);
@@ -66,8 +76,6 @@ const CustomSelectClass = forwardRef((props, ref) => {
 
         log('handle class create')
 
-
-
         if (currentClassInput !== '') {
 
             try {
@@ -83,12 +91,12 @@ const CustomSelectClass = forwardRef((props, ref) => {
                 } else {
 
 
-                    const ids=[];
+                    const ids = [];
                     classInfo.map(object => {
-                        if (parseInt(object.color_id)<1000){
+                        if (parseInt(object.color_id) < 1000) {
                             ids.push(parseInt(object.color_id))
                         }
-                        
+
                     });
 
                     const myColorId = (ids.length > 0) ? (Math.max(...ids) + 1) : 0;
@@ -100,6 +108,8 @@ const CustomSelectClass = forwardRef((props, ref) => {
 
                     log('myPayload')
                     log(myPayload)
+
+                    const myItem = {};
 
                     addClassAPI(datasetId, myPayload)
                         .then(({ data }) => {
@@ -128,6 +138,51 @@ const CustomSelectClass = forwardRef((props, ref) => {
 
                                 //myClassInfo
 
+                                if (dataType === 'classification') {
+                                    if (selectedIndex >= 0) {
+                                        dispatch(setCurrentBbox([myClassInfo[selectedIndex]]));
+                                       
+
+                                        // update to server
+                                        const myOldClassName = (currentBbox.length>0)?currentBbox[0].class_name:"Unlabeled";
+                                        const myNewClassName = myClassInfo[selectedIndex].class_name;
+
+                                        const myPayload = {};
+                                        myPayload.images_info = { [myOldClassName] : [imageName.replace("//", "")] };
+                                        myPayload.class_name = myNewClassName;
+
+                                        editImgClassAPI(datasetId, myPayload)
+                                            .then(({ data }) => {
+                                                log('update class to classification success', data)
+
+                                                favoriteLabelAPI(datasetId)
+                                                .then(({ data }) => {
+                                                    const myData = data.data;
+                                                    const myArr = [];
+                                                    Object.keys(myData).forEach(function (k) {
+                                                        log(myData[k]);
+                                                        myArr.push(myData[k]);
+                                                    });
+                                                    dispatch(setFavLabels(myArr));
+                                                }).catch(({ response }) => {
+                                                    log(response.data.message);
+                                                    dispatch(setFavLabels([]));
+                                                });
+
+                                                // Refresh Local Data    
+                                               
+                                                props.onClassChange([myClassInfo[selectedIndex]],myNewClassName,myOldClassName)
+
+                                            }).catch(({ response }) => {
+                                                log(response.data.message);
+                                            });
+
+
+                                        
+                                    }
+                                }
+
+
                             })
 
 
@@ -135,12 +190,35 @@ const CustomSelectClass = forwardRef((props, ref) => {
                             log(response.data.message);
                         });
 
+
+                    log('dataType',dataType)
+                    if (dataType==='classification'){
+
+                        log('currentBbox',currentBbox)
+                        const myBoxInfo={};
+                        myBoxInfo.bbox=[0,0,0,0];
+                        myBoxInfo.class_id=myItem.class_id;
+                        myBoxInfo.class_name=myItem.class_name;
+                        myBoxInfo.color_hex=myItem.color_hex;
+                        myBoxInfo.color_id=myItem.color_id;
+                        log('myBoxInfo',myBoxInfo)
+                        dispatch(setCurrentBbox([myBoxInfo]));
+                        //props.onClassChange([myBoxInfo])
+
+                    }
+
+
+
+
                 }
 
             } catch (error) {
                 log(error)
             }
         }
+
+        setCurrentClassInput('');
+
 
     }
 
@@ -160,7 +238,11 @@ const CustomSelectClass = forwardRef((props, ref) => {
 
     const handleClassMenuClick = (event, value) => {
 
-        expandClassMenu ? setExpandClassMenu(false) : setExpandClassMenu(true); 
+        log('handle classs menu toggle')
+
+        log('classSelectedIndex',classSelectedIndex)
+
+        expandClassMenu ? setExpandClassMenu(false) : setExpandClassMenu(true);
 
     };
 
@@ -173,11 +255,14 @@ const CustomSelectClass = forwardRef((props, ref) => {
             if (classInfo.length === 0) {
                 dispatch(setClassEditingIndex(-2))
             }
-            if ((classInfo.length - 1) >= props.defaultValue) {
-                log('set default selected class')
-                dispatch(setClassSelectedIndex(props.defaultValue))
+            if (dataType === 'object_detection') {
+                if ((classInfo.length - 1) >= props.defaultValue) {
+                    log('set default selected class')
+                    dispatch(setClassSelectedIndex(props.defaultValue))
 
+                }
             }
+
         }
 
     }, [props.defaultValue, classInfo]);
@@ -204,7 +289,14 @@ const CustomSelectClass = forwardRef((props, ref) => {
             dispatch(setClassEditingIndex(-1))
             setExpandClassMenu(false);
 
-        }
+        },
+
+        setDeleteClassConfirm: () => {
+
+           log('Set Delete Class Confirm')
+           classEditPanelRef.current.setDeleteClassConfirm();
+
+        },
     }));
 
 
@@ -213,6 +305,10 @@ const CustomSelectClass = forwardRef((props, ref) => {
         log('handle out side click')
         log('classEditingIndex')
         log(classEditingIndex)
+
+        if (!props.showDeleteConfirmModal){
+
+        
 
         const actionName = evt.target.getAttribute('name');
 
@@ -225,65 +321,67 @@ const CustomSelectClass = forwardRef((props, ref) => {
                 log('create new class now')
                 handleClassCreate();
             }
-            
-        } 
+
+        }
         if (classEditingIndex >= 0) {
 
             dispatch(setClassEditingIndex(-1));
             setExpandClassMenu(true);
 
-          
+
 
             // update class name to server
-            classInfo.forEach((item,idx)=>{
+            classInfo.forEach((item, idx) => {
 
-                if (item.class_name!==classInfoPrev[idx].class_name){
-                 
-                    if (item.class_name!==''){
+                if (item.class_name !== classInfoPrev[idx].class_name) {
+
+                    if (item.class_name !== '') {
                         const myPayload = {};
                         myPayload.class_name = classInfoPrev[idx].class_name;
                         myPayload.new_name = item.class_name;
-    
+
                         renameClassAPI(datasetId, myPayload)
-                        .then(({ data }) => {
-                            log('rename success')
-                        });
-                    }else{
+                            .then(({ data }) => {
+                                log('rename success')
+
+                                props.onClassModifyDone();
+                            });
+                    } else {
                         dispatch(setClassInfo(classInfoPrev));
                     }
-                    
+
                 }
             })
 
             // update class color to server
 
-            classInfo.forEach((item,idx)=>{
+            classInfo.forEach((item, idx) => {
 
-                if (item.color_hex!==classInfoPrev[idx].color_hex){
-                 
+                if (item.color_hex !== classInfoPrev[idx].color_hex) {
+
                     const myPayload = {};
                     myPayload.class_name = item.class_name;
                     myPayload.color_hex = item.color_hex;
                     myPayload.color_id = '';
 
                     classChangeColorAPI(datasetId, myPayload)
-                    .then(({ data }) => {
-                        log('change class color success')
-                    }).catch(({ response }) => {
-                        log(response.data.message);
-                    });
+                        .then(({ data }) => {
+                            log('change class color success')
+                        }).catch(({ response }) => {
+                            log(response.data.message);
+                        });
                 }
             })
-         
-          
-            
-        }else{
-            (actionName==='classInputName')?setExpandClassMenu(true):setExpandClassMenu(false);
+
+
+
+        } else {
+            (actionName === 'classInputName') ? setExpandClassMenu(true) : setExpandClassMenu(false);
         }
-        
+
         setCurrentClassInput('');
-       
-        
+
+        }
 
     }
 
@@ -292,28 +390,68 @@ const CustomSelectClass = forwardRef((props, ref) => {
         log('handle Class Selected')
 
         log(myIndex)
+
         setDialogOrder(-1);
         setExpandClassMenu(false);
         dispatch(setClassEditingIndex(-1));
         dispatch(setClassSelectedIndex(myIndex));
         inputClassRef.current.value = classInfo[myIndex].class_name;
 
-        log('classInfo')
-        log(classInfo)
 
+        if (dataType === 'classification') {
 
-        // props.data.forEach(ele => {
-        //     if (ele.class_id===myClassItem.class_id) {
-        //         setSelectedItem(ele);
-        //         setDialogOrder(-1);
-        //         setExpandClassMenu(false);
-        //         props.onChange(ele);
-        //     }
+            log('currentBbox', currentBbox)
+            const myBoxInfo = {};
+            myBoxInfo.bbox = [0, 0, 0, 0];
+            myBoxInfo.class_id = classInfo[myIndex].class_id;
+            myBoxInfo.class_name = classInfo[myIndex].class_name;
+            myBoxInfo.color_hex = classInfo[myIndex].color_hex;
+            myBoxInfo.color_id = classInfo[myIndex].color_id;
 
-        // });
+            log('myBoxInfo', myBoxInfo)
+            dispatch(setCurrentBbox([myBoxInfo]));
 
-        log('dataType',dataType)
-       // if (dataType==='class')
+            // const realIndex = dataSetList[currentIdx].idx;
+            // imgBoxList[realIndex].box_info = myBox;
+
+            const myOldClassName=(currentBbox.length>0)?currentBbox[0].class_name:"Unlabeled";
+            const myNewClassName=classInfo[myIndex].class_name;
+
+            log('myNewClassName',myNewClassName)
+            log('myOldClassName',myOldClassName)
+
+    
+            // update to server
+            const myPayload = {};
+            myPayload.images_info = { [myOldClassName] : [imageName.replace("//", "")] };
+            myPayload.class_name = myNewClassName;
+
+            editImgClassAPI(datasetId, myPayload)
+                .then(({ data }) => {
+                    log('update class to classification success', data)
+
+                    favoriteLabelAPI(datasetId)
+                    .then(({ data }) => {
+                        const myData = data.data;
+                        const myArr = [];
+                        Object.keys(myData).forEach(function (k) {
+                            log(myData[k]);
+                            myArr.push(myData[k]);
+                        });
+                        dispatch(setFavLabels(myArr));
+
+                        props.onClassChange([myBoxInfo],myNewClassName,myOldClassName);
+
+                    }).catch(({ response }) => {
+                        log(response.data.message);
+                        dispatch(setFavLabels([]));
+                    });
+
+                }).catch(({ response }) => {
+                    log(response.data.message);
+                });
+
+        }
 
     }
 
@@ -323,11 +461,15 @@ const CustomSelectClass = forwardRef((props, ref) => {
         }
     }
 
-    const handleDeleteClassDone = () => {
+    const handleClassModifyDone = () => {
 
         dispatch(setClassEditingIndex(-1));
-        props.onDeleteClassDone();
+        props.onClassModifyDone();
 
+    }
+
+    const handleDeleteClass = () =>{
+        props.onDeleteClass();
     }
 
     const CustomClassItem = ({ item, onSelected, onHover, onOpen, order, onFocus }) => {
@@ -408,7 +550,12 @@ const CustomSelectClass = forwardRef((props, ref) => {
     }
 
     const handleSelectedInputChange = (value) => {
-        setCurrentClassInput(value)
+        const checkValue=value.replace("+","").replace("/","").replace("?","").replace("%","").replace("#","").replace("&","").replace("=","").replace(" ","");
+        setCurrentClassInput(checkValue)
+
+        if (checkValue.length!== value.length){
+            props.onAlert(1,'Illegal character input');
+        }
 
     }
 
@@ -436,33 +583,59 @@ const CustomSelectClass = forwardRef((props, ref) => {
 
     }, []);
 
+    useEffect(() => {
+
+        log('currentBbox change....')
+        log(currentBbox)
+
+        if (dataType === 'classification') {
+
+            if (currentBbox.length === 0) {
+                dispatch(setClassSelectedIndex(-1));
+            } else {
+
+                const myClassName = currentBbox[0].class_name;
+
+                const myIndex = findIndex(classInfo, (ele) => {
+                    return ele.class_name == myClassName;
+                }, 0);
+                dispatch(setClassSelectedIndex(myIndex));
+
+            }
+
+        }
+
+    }, [currentBbox]);
+
     return (
 
         <div style={{ width: 240, height: 52 }}>
-            {/* <ClassTooltip> */}
+            <ClassTooltip expandClassMenu={expandClassMenu}>
                 <div className="my-input-group" >
                     <input type="text" className="my-source-input" aria-label="Text input with dropdown button" placeholder='--- please select ---'
                         onChange={(evt) => handleSelectedInputChange(evt.target.value)}
                         onFocus={handleClassFocus}
-                        value={(classSelectedIndex === -1) ? ((classEditingIndex === -2) ? currentClassInput : '') : (classInfo[classSelectedIndex]===undefined)?'':classInfo[classSelectedIndex].class_name}
-                        ref={inputClassRef} 
+                        value={(classSelectedIndex === -1) ? ((classEditingIndex === -2) ? currentClassInput : '') : (classInfo[classSelectedIndex] === undefined) ? '' : classInfo[classSelectedIndex].class_name}
+                        ref={inputClassRef}
                         name="classInputName"
-                        />
+                        autoComplete="off"
+                    />
                     <button className="my-source-input-button" type="button" aria-expanded="false"
                         disabled={props.disabled}
                         onClick={handleClassMenuClick}
                         ref={buttonRef}
                     >
                         {
-                            expandClassMenu ? 
-                            <FontAwesomeIcon icon={faChevronDown} className="my-chevron-icon" transform="shrink-3" />
-                            :
-                            <FontAwesomeIcon icon={faChevronUp} className="my-chevron-icon" transform="shrink-3" />
+                            expandClassMenu ?
+                                <FontAwesomeIcon icon={faChevronUp} className="my-chevron-icon" transform="shrink-3" />
+                                :
+                                <FontAwesomeIcon icon={faChevronDown} className="my-chevron-icon" transform="shrink-3" />
                         }
-                    
+
                     </button>
 
-                    <Label_Man fill={(classSelectedIndex === -1) ? '#16272E3D' : (classInfo[classSelectedIndex]===undefined)?'#16272E3D':classInfo[classSelectedIndex].color_hex} className="my-class-icon"></Label_Man>
+                    <Label_Man fill={(classSelectedIndex === -1) ? '#16272E3D' : (classInfo[classSelectedIndex] === undefined) ? '#16272E3D' : classInfo[classSelectedIndex].color_hex} className="my-class-icon"></Label_Man>
+                   
                     {
                         expandClassMenu &&
                         <div className='my-class-menu position-relative'>
@@ -486,7 +659,7 @@ const CustomSelectClass = forwardRef((props, ref) => {
 
                                         <div style={{ position: 'relative' }}>
                                             <div style={{ position: 'absolute', left: 120, top: dialogTop }}>
-                                                <ClassEditPanel data={props.data} dialogOrder={dialogOrder} onDeleteClassDone={handleDeleteClassDone}></ClassEditPanel>
+                                                <ClassEditPanel data={props.data} dialogOrder={dialogOrder} onDeleteClassDone={handleClassModifyDone} onDeleteClass={handleDeleteClass} onAlert={props.onAlert} ref={classEditPanelRef}></ClassEditPanel>
                                             </div>
                                         </div>
 
@@ -512,7 +685,7 @@ const CustomSelectClass = forwardRef((props, ref) => {
 
 
                 </div>
-            {/* </ClassTooltip> */}
+            </ClassTooltip>
         </div>
 
     );

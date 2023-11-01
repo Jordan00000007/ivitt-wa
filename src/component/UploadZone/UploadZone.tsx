@@ -276,7 +276,7 @@ const UploadZone = (props: UploadZoneProps) => {
           <Description>Drag & drop your files or
             <CustomSpan onClick={open}>browse</CustomSpan>
           </Description>
-          <Note>Supported formats: 'jpg', 'jpeg', 'png', 'bmp'.</Note>
+          <Note>Supported formats: 'jpg', 'jpeg', 'png', 'bmp', 'txt'.</Note> 
         </DropContainer>
         :
         <FileItemContainer

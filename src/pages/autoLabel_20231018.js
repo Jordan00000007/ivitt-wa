@@ -7,7 +7,7 @@ import Hotkeys from "react-hot-keys";
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { useDispatch, useSelector } from 'react-redux';
 import { FixedSizeGrid as Grid } from 'react-window';
-import { map, find, filter, includes, cloneDeep, uniqBy, findIndex } from 'lodash-es';
+import { map, find, filter, includes, cloneDeep, uniqBy } from 'lodash-es';
 import OutsideClickHandler from 'react-outside-click-handler';
 import Modal from '@mui/joy/Modal';
 import ModalDialog from '@mui/joy/ModalDialog';
@@ -23,8 +23,6 @@ import { apiHost } from '../constant/API/APIPath';
 import CustomSelectDataset from '../components/Dropdowns/CustomSelectDataset';
 import CustomSelectClass from '../components/Dropdowns/CustomSelectClass';
 import CustomSelect from '../components/Dropdowns/CustomSelect';
-import CustomAlert from '../components/Alerts/CustomAlert';
-import UndoAlert from '../components/Alerts/UndoAlert';
 
 import ToggleButton from '../components/Buttons/ToggleButton';
 import AnnotationItem from '../components/PanelItems/AnnotationItem';
@@ -87,7 +85,7 @@ const AutoLabel = forwardRef((props, ref) => {
     const [dataSetList, setDataSetList] = useState([]);
     const [unlabeledCount, setUnlabeledCount] = useState(0);
 
-    const [showAutoLabelPanel, setShowAutoLabelPanel] = useState(false);
+    const [showAutoLabelPanel,setShowAutoLabelPanel] = useState(false);
 
     const [combinedClassArr, setCombinedClassArr] = useState([]);
 
@@ -95,17 +93,10 @@ const AutoLabel = forwardRef((props, ref) => {
 
     const [currentSelectedClass, setCurrentSelectedClass] = useState(null);
 
-    const [prevBox, setPrevBox] = useState([]);
-    const [prevAiBox, setPrevAiBox] = useState([]);
-
 
     const [selectedLabelIdx, setSelectedLabelIdx] = useState(-1);
 
     const [showAutoLabelingSettingModal, setShowAutoLabelingSettingModal] = useState(false);
-
-    const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
-
-
 
     const [iterationData, setIterationData] = useState([]);
     const [confidenceData, setconfidenceData] = useState([[0.7, 0.7], [0.75, 0.75], [0.8, 0.8], [0.85, 0.85], [0.9, 0.9], [0.95, 0.95]]);
@@ -117,9 +108,6 @@ const AutoLabel = forwardRef((props, ref) => {
     const [toolSelect, setToolSelect] = useState(true);
 
     const [confirmStatus, setConfirmStatus] = useState(false);
-
-    const [showType, setShowType] = useState(0);
-    const [showText, setShowText] = useState('');
 
     const currentTab = useSelector(selectCurrentTab).tab;
 
@@ -135,9 +123,6 @@ const AutoLabel = forwardRef((props, ref) => {
 
 
     const gridRef = React.createRef();
-
-    const alertRef = useRef();
-    const undoAlertRef = useRef();
 
 
 
@@ -168,17 +153,17 @@ const AutoLabel = forwardRef((props, ref) => {
         this.setState({ isHovered: false })
     }
 
-    const handleDeleteClass = () => {
-        setShowDeleteConfirmModal(true);
-    }
+    // const handleClassChange = (mySelectedClassItem) => {
+    //     log('handle class change')
+    //     log(mySelectedClassItem)
+    //     setCurrentSelectedClass(mySelectedClassItem)
+
+    // }
 
     const setDataSetListByClassId = (myData, myClassId) => {
         switch (myClassId) {
             case -1: {
                 setDataSetList(myData);
-
-                log('current dataset list ----------------------->', dataSetList)
-                log('current myData list ----------------------->', myData)
                 break;
             }
             case -2: {
@@ -202,45 +187,13 @@ const AutoLabel = forwardRef((props, ref) => {
         }
     }
 
-    const setDataSetListByClassName = (myData, myClassName) => {
-
-
-        setActiveClassName(myClassName);
-
-        switch (myClassName) {
-            case 'All': {
-                setDataSetList(myData);
-
-                break;
-            }
-            case 'Unlabeled': {
-                const res = filter(myData, (obj) => {
-                    if (obj.box_info.length === 0) return true;
-                })
-                setDataSetList(res);
-                break;
-            }
-            default: {
-
-                const res = filter(myData, (obj) => {
-                    const res2 = find(obj.box_info, (obj2) => {
-                        if (obj2.class_name === myClassName) return true
-                    })
-                    if (res2 !== undefined) return true;
-                })
-                setDataSetList(res);
-                break;
-            }
-        }
-    }
-
     const handleDatatSetFilterChange = (myValue) => {
 
         dispatch(setCurrentIdx(0));
         setScrollingLocation(0);
         if (myValue !== null) {
 
-            setDataSetListByClassName(imgBoxList, myValue)
+            setDataSetListByClassId(imgBoxList, myValue)
 
             setActiveClassName(myValue);
         }
@@ -251,156 +204,281 @@ const AutoLabel = forwardRef((props, ref) => {
     }));
 
 
-    const handleDeleteClassConfirm = () => {
 
-        setShowDeleteConfirmModal(false);
-        classSelectorRef.current.setDeleteClassConfirm();
+    useEffect(() => {
 
-    }
+        if (imgDataList.length > 0) {
 
-    const fetchBoxInfoForClassification = (myImgDataList) => {
-        let myImgBoxInfo = new Array(myImgDataList.length);
-        let myCounter = 0;
-        let myUnlabeledCounter = 0;
+            // if (dataType === 'object_detection') {
 
-        imgDataList.forEach((item, idx) => {
-            getImgLabelAPI(datasetId, item.replace("./", "/"))
-                .then(({ data }) => {
+            //     let myImgBoxInfo = new Array(imgDataList.length);
+            //     let myCounter = 0;
+            //     let myUnlabeledCounter = 0;
 
-                    log('--- getImgLabelAPI : data ---')
-                    log(data)
-                    log(data.data)
+            //     imgDataList.forEach((item, idx) => {
 
-                    const keyArr = Object.keys(data.data)
-
-                    data.data.img_path = imgDataList[idx]
-                    myImgBoxInfo[idx] = data.data;
-                    myImgBoxInfo[idx].idx = idx;
-                    myImgBoxInfo[idx].img_shape = [100, 100];
+            //         getBboxAPI(datasetId, { image_path: item.replace("./", "/") })
+            //             .then(({ data }) => {
 
 
-                    if (JSON.stringify(data.data) === '{}') {
-                        myUnlabeledCounter++;
-                        myImgBoxInfo[idx].box_info = [];
-                    } else {
+            //                 data.data.img_path = imgDataList[idx]
+            //                 myImgBoxInfo[idx] = data.data;
+            //                 myImgBoxInfo[idx].idx = idx;
+            //                 myCounter++;
+            //                 if (data.data.box_info.length === 0) myUnlabeledCounter++;
 
-                        log('keyArr')
-                        log(keyArr)
+            //                 if (myCounter === imgDataList.length) {
 
-                        const myBoxInfo = {};
-                        if (keyArr.length > 0) {
-                            const myClass = keyArr[0];
-                            myBoxInfo.class_name = myClass;
-                            myBoxInfo.class_id = data.data[myClass].class_id;
-                            myBoxInfo.color_hex = data.data[myClass].color_hex;
-                            myBoxInfo.color_id = data.data[myClass].color_id;
-                            myBoxInfo.bbox = [0, 0, 0, 0];
 
-                        }
 
-                        log('myBoxInfo')
-                        log(myBoxInfo)
+            //                     setImgBoxList(myImgBoxInfo);
 
-                        if (JSON.stringify(myBoxInfo) !== '{}') {
-                            myImgBoxInfo[idx].box_info = [myBoxInfo];
-                        } else {
-                            myImgBoxInfo[idx].box_info = [];
-                        }
+            //                     const myClassId = (activeClassName === 'All') ? -1 : ((activeClassName === 'Unlabeled') ? -2 : getClassId(activeClassName));
 
-                    }
+            //                     log('-------------------------------')
+            //                     log('myImgBoxInfo', myImgBoxInfo)
+            //                     log('myClassId', myClassId)
 
-                    log('myUnlabeledCounter')
-                    log(myUnlabeledCounter)
+            //                     setDataSetListByClassId(myImgBoxInfo, myClassId);
+            //                     setUnlabeledCount(myUnlabeledCounter);
+            //                     dispatch(closeLoading());
 
-                    getBboxAPI(datasetId, { image_path: item.replace("./", "/") })
+            //                 }
+
+            //             })
+            //             .catch((error) => {
+            //                 log(error);
+            //             });
+
+            //     })
+            // }
+
+            // if (dataType === 'classification') {
+
+            //     let myImgBoxInfo = new Array(imgDataList.length);
+            //     let myCounter = 0;
+            //     let myUnlabeledCounter = 0;
+
+            //     imgDataList.forEach((item, idx) => {
+
+            //         getImgLabelAPI(datasetId, item.replace("./", "/"))
+            //             .then(({ data }) => {
+
+            //                 log('--- getImgLabelAPI : data ---')
+            //                 log(data)
+            //                 log(data.data)
+
+            //                 const keyArr = Object.keys(data.data)
+
+            //                 data.data.img_path = imgDataList[idx]
+            //                 myImgBoxInfo[idx] = data.data;
+            //                 myImgBoxInfo[idx].idx = idx;
+            //                 myImgBoxInfo[idx].img_shape = [100, 100];
+
+
+            //                 if (JSON.stringify(data.data) === '{}') {
+            //                     myUnlabeledCounter++;
+            //                     myImgBoxInfo[idx].box_info = [];
+            //                 } else {
+
+            //                     log('keyArr')
+            //                     log(keyArr)
+
+            //                     const myBoxInfo = {};
+            //                     if (keyArr.length > 0) {
+            //                         const myClass = keyArr[0];
+            //                         myBoxInfo.class_name = myClass;
+            //                         myBoxInfo.class_id = data.data[myClass].class_id;
+            //                         myBoxInfo.color_hex = data.data[myClass].color_hex;
+            //                         myBoxInfo.color_id = data.data[myClass].color_id;
+            //                         myBoxInfo.bbox = [0, 0, 0, 0];
+
+            //                     }
+
+            //                     log('myBoxInfo')
+            //                     log(myBoxInfo)
+
+            //                     if (JSON.stringify(myBoxInfo) !== '{}'){
+            //                         myImgBoxInfo[idx].box_info = [myBoxInfo];
+            //                     }else{
+            //                         myImgBoxInfo[idx].box_info = [];
+            //                     }
+                                
+            //                 }
+
+            //                 log('myUnlabeledCounter')
+            //                 log(myUnlabeledCounter)
+
+            //                 getBboxAPI(datasetId, { image_path: item.replace("./", "/") })
+            //                     .then(({ data }) => {
+            //                         log('=== getBboxAPI data.data ===')
+            //                         log(data.data.img_shape)
+            //                         myImgBoxInfo[idx].img_shape = data.data.img_shape;
+            //                         myCounter++;
+
+            //                         if (myCounter === imgDataList.length) {
+
+            //                             log('--- raw data ---')
+            //                             log(myImgBoxInfo)
+            //                             setImgBoxList(myImgBoxInfo);
+
+            //                             const myClassId = (activeClassName === 'All') ? -1 : ((activeClassName === 'Unlabeled') ? -2 : getClassId(activeClassName));
+
+            //                             log('-------------------------------')
+            //                             log('myImgBoxInfo', myImgBoxInfo)
+            //                             log('myClassId', myClassId)
+
+            //                             setDataSetListByClassId(myImgBoxInfo, myClassId);
+            //                             setUnlabeledCount(myUnlabeledCounter);
+            //                             dispatch(closeLoading());
+
+            //                         }
+
+
+            //                     })
+            //                     .catch(({ response }) => {
+            //                         log(response.data.message);
+            //                     });
+
+
+            //             })
+            //             .catch(({ response }) => {
+            //                 log(response.data.message);
+            //             });
+
+
+
+
+
+
+            //     })
+            // }
+
+              if (dataType === 'object_detection') {
+
+                let myImgBoxInfo = new Array(imgDataList.length);
+                let myCounter = 0;
+                let myUnlabeledCounter = 0;
+
+                imgDataList.forEach((item, idx) => {
+
+                    const myItem={};
+                    myItem.idx = idx;
+                    myItem.img_path = item;
+                    myItem.box_info = [];
+                    myItem.img_shape = [400,300];
+                    myImgBoxInfo[idx]=myItem;
+
+                })
+
+                setImgBoxList(myImgBoxInfo);
+
+                const myClassId = (activeClassName === 'All') ? -1 : ((activeClassName === 'Unlabeled') ? -2 : getClassId(activeClassName));
+
+                log('-------------------------------')
+                log('myImgBoxInfo', myImgBoxInfo)
+                log('myClassId', myClassId)
+
+                setDataSetListByClassId(myImgBoxInfo, myClassId);
+                //setUnlabeledCount(myUnlabeledCounter);
+                dispatch(closeLoading());
+            }
+
+            if (dataType === 'classification') {
+
+                let myImgBoxInfo = new Array(imgDataList.length);
+                let myCounter = 0;
+                let myUnlabeledCounter = 0;
+
+                imgDataList.forEach((item, idx) => {
+
+                    getImgLabelAPI(datasetId, item.replace("./", "/"))
                         .then(({ data }) => {
-                            log('=== getBboxAPI data.data ===')
-                            log(data.data.img_shape)
-                            myImgBoxInfo[idx].img_shape = data.data.img_shape;
-                            myCounter++;
 
-                            if (myCounter === imgDataList.length) {
+                            log('--- getImgLabelAPI : data ---')
+                            log(data)
+                            log(data.data)
 
-                                log('--- raw data ---')
-                                log(myImgBoxInfo)
-                                setImgBoxList(myImgBoxInfo);
+                            const keyArr = Object.keys(data.data)
 
-                                const myClassId = (activeClassName === 'All') ? -1 : ((activeClassName === 'Unlabeled') ? -2 : getClassId(activeClassName));
+                            data.data.img_path = imgDataList[idx]
+                            myImgBoxInfo[idx] = data.data;
+                            myImgBoxInfo[idx].idx = idx;
+                            myImgBoxInfo[idx].img_shape = [100, 100];
 
-                                log('-------------------------------')
-                                log('myImgBoxInfo', myImgBoxInfo)
-                                log('myClassId', myClassId)
 
-                                setDataSetListByClassId(myImgBoxInfo, myClassId);
-                                setUnlabeledCount(myUnlabeledCounter);
-                                dispatch(closeLoading());
+                            if (JSON.stringify(data.data) === '{}') {
+                                myUnlabeledCounter++;
+                                myImgBoxInfo[idx].box_info = [];
+                            } else {
 
+                                log('keyArr')
+                                log(keyArr)
+
+                                const myBoxInfo = {};
+                                if (keyArr.length > 0) {
+                                    const myClass = keyArr[0];
+                                    myBoxInfo.class_name = myClass;
+                                    myBoxInfo.class_id = data.data[myClass].class_id;
+                                    myBoxInfo.color_hex = data.data[myClass].color_hex;
+                                    myBoxInfo.color_id = data.data[myClass].color_id;
+                                    myBoxInfo.bbox = [0, 0, 0, 0];
+
+                                }
+
+                                log('myBoxInfo')
+                                log(myBoxInfo)
+
+                                if (JSON.stringify(myBoxInfo) !== '{}'){
+                                    myImgBoxInfo[idx].box_info = [myBoxInfo];
+                                }else{
+                                    myImgBoxInfo[idx].box_info = [];
+                                }
+                                
                             }
 
+                            log('myUnlabeledCounter')
+                            log(myUnlabeledCounter)
+
+                            getBboxAPI(datasetId, { image_path: item.replace("./", "/") })
+                                .then(({ data }) => {
+                                    log('=== getBboxAPI data.data ===')
+                                    log(data.data.img_shape)
+                                    myImgBoxInfo[idx].img_shape = data.data.img_shape;
+                                    myCounter++;
+
+                                    if (myCounter === imgDataList.length) {
+
+                                        log('--- raw data ---')
+                                        log(myImgBoxInfo)
+                                        setImgBoxList(myImgBoxInfo);
+
+                                        const myClassId = (activeClassName === 'All') ? -1 : ((activeClassName === 'Unlabeled') ? -2 : getClassId(activeClassName));
+
+                                        log('-------------------------------')
+                                        log('myImgBoxInfo', myImgBoxInfo)
+                                        log('myClassId', myClassId)
+
+                                        setDataSetListByClassId(myImgBoxInfo, myClassId);
+                                        setUnlabeledCount(myUnlabeledCounter);
+                                        dispatch(closeLoading());
+
+                                    }
+
+
+                                })
+                                .catch(({ response }) => {
+                                    log(response.data.message);
+                                });
 
                         })
                         .catch(({ response }) => {
                             log(response.data.message);
                         });
 
-
                 })
-                .catch(({ response }) => {
-                    log(response.data.message);
-                });
-        })
-    }
-
-    const fetchBoxInfoForObjectDetection = (myImgDataList) => {
-
-        let myImgBoxInfo = new Array(imgDataList.length);
-        let myCounter = 0;
-        let myUnlabeledCounter = 0;
-
-        getBboxAPI(datasetId, {})
-            .then(({ data }) => {
-
-                const myData = data.data;
-
-                Object.keys(myData).forEach(function (myKey) {
-
-                    const myIdx = findIndex(imgDataList, (ele) => {
-                        return ele.replace(/^.*[\/]/, '') === myKey;
-                    }, 0);
-
-                    myImgBoxInfo[myIdx] = myData[myKey];
-                    myImgBoxInfo[myIdx].idx = myIdx;
-                    myImgBoxInfo[myIdx].img_path = imgDataList[myIdx];
-
-                    setImgBoxList(myImgBoxInfo);
-
-                });
-
-                setDataSetListByClassName(myImgBoxInfo, activeClassName);
-                dispatch(closeLoading());
-
-            })
-            .catch((error) => {
-                log(error);
-            });
-
-    }
-
-    useEffect(() => {
-
-        if (imgDataList.length > 0) {
-
-            if (dataType === 'object_detection') {
-
-                fetchBoxInfoForObjectDetection(imgDataList);
-
             }
 
-            if (dataType === 'classification') {
-
-                fetchBoxInfoForClassification(imgDataList);
-
-            }
         }
 
     }, [imgDataList]);
@@ -432,13 +510,22 @@ const AutoLabel = forwardRef((props, ref) => {
 
     useEffect(() => {
 
-        const myPayload = {
-            iteration: 'workspace',
-            class_name: 'All',
+        log('currentIter')
+        log(currentIter)
+
+        log('activeClassName')
+        log(activeClassName)
+
+        log('dataType')
+        log(dataType)
+
+        const reqData = {
+            iteration: currentIter,
+            class_name: activeClassName,
         }
 
         try {
-            toGetDatasetImgAPI(datasetId, myPayload).then((data) => {
+            toGetDatasetImgAPI(datasetId, reqData).then((data) => {
                 setImgDataList(data.data.data.img_path)
             })
         } catch (error) {
@@ -734,11 +821,6 @@ const AutoLabel = forwardRef((props, ref) => {
 
         if (labelIndex >= 0) {
 
-            const delName = currentBbox[labelIndex].class_name;
-
-            setPrevBox(currentBbox);
-            setPrevAiBox([]);
-
             const newBbox = currentBbox.filter(function (value, index) {
                 return index !== labelIndex;
             });
@@ -746,7 +828,7 @@ const AutoLabel = forwardRef((props, ref) => {
             const myPayload = {};
             myPayload.image_name = imageName;
             myPayload.box_info = newBbox;
-            myPayload.confirm = confirmStatus;
+            myPayload.confirm = 0;
 
             dispatch(setCurrentBbox(newBbox));
             dispatch(setLabelIndex(-1));
@@ -757,10 +839,6 @@ const AutoLabel = forwardRef((props, ref) => {
             updateBboxAPI(datasetId, myPayload)
                 .then(({ status }) => {
                     log('updateBboxAPI-res', status);
-
-                    setShowType(0);
-                    setShowText(`${delName} annotation has been deleted`);
-                    undoAlertRef.current.setShowTrue(3000);
 
                     favoriteLabelAPI(datasetId)
                         .then(({ data }) => {
@@ -791,24 +869,20 @@ const AutoLabel = forwardRef((props, ref) => {
 
         if (aiLabelIndex >= 0) {
 
-            const delName = autoBox[aiLabelIndex].class_name;
-
-            setPrevAiBox(autoBox);
-            setPrevBox([]);
-
-
             const newBbox = autoBox.filter(function (value, index) {
                 return index !== aiLabelIndex;
             });
 
-
+            const myPayload = {};
+            myPayload.image_name = imageName;
+            myPayload.box_info = newBbox;
+            myPayload.confirm = 0;
 
             dispatch(setAutoBox(newBbox));
             dispatch(setAiLabelIndex(-1));
 
-            setShowType(0);
-            setShowText(`${delName} annotation has been deleted`);
-            undoAlertRef.current.setShowTrue(3000);
+            log('--- delete label ---')
+            log(myPayload)
 
 
 
@@ -899,33 +973,20 @@ const AutoLabel = forwardRef((props, ref) => {
 
         log('handle box change')
 
-        log('myBox', myBox)
+        log('myBox',myBox)
 
         const realIndex = dataSetList[currentIdx].idx;
         imgBoxList[realIndex].box_info = myBox;
 
     }
 
-    const handleClassChange = (myBox, myNewName, myOldName) => {
+    const handleClassChange = (myBox) => {
 
-        log('myBox', myBox)
-        log('myNewName', myNewName)
-        log('myOldName', myOldName)
+        log('myBox',myBox)
 
         const realIndex = dataSetList[currentIdx].idx;
         imgBoxList[realIndex].box_info = myBox;
 
-        const myImgPath = imgDataList[realIndex].replace((myOldName === 'Unlabeled') ? `//` : `/${myOldName}/`, `/${myNewName}/`);
-
-        log('imgDataList-------->', imgDataList[realIndex])
-        log('imgBoxList-------->', imgBoxList[realIndex])
-
-        imgDataList[realIndex] = myImgPath;
-        imgBoxList[realIndex].img_path = myImgPath;
-
-
-        log('imgDataList-------->', imgDataList[realIndex])
-        log('imgBoxList-------->', imgBoxList[realIndex])
     }
 
 
@@ -964,12 +1025,6 @@ const AutoLabel = forwardRef((props, ref) => {
         }
     }
 
-    const handleAlertShow = (myType, myMessage) => {
-
-        setShowType(myType);
-        setShowText(myMessage);
-        alertRef.current.setShowTrue(3000);
-    }
 
     const handleAutoBoxConfirm = () => {
 
@@ -1186,89 +1241,29 @@ const AutoLabel = forwardRef((props, ref) => {
             })
     }
 
-    const handleUndoBox = () => {
+    const handleDeleteClassDone = () => {
 
-        if (prevBox.length > 0) {
+        log('--- handle Delete Class Done ---')
 
-            const myPayload = {};
-            myPayload.image_name = imageName;
-            myPayload.box_info = prevBox;
-            myPayload.confirm = confirmStatus;
-
-            dispatch(setCurrentBbox(prevBox));
-            dispatch(setLabelIndex(-1));
-
-            log('--- delete label ---')
-            log(myPayload)
-
-            updateBboxAPI(datasetId, myPayload)
-                .then(({ status }) => {
-                    log('updateBboxAPI-res', status);
-
-                    handleBoxChange(prevBox);
-
-                    favoriteLabelAPI(datasetId)
-                        .then(({ data }) => {
-                            const myData = data.data;
-                            const myArr = [];
-                            Object.keys(myData).forEach(function (k) {
-                                log(myData[k]);
-                                myArr.push(myData[k]);
-                            });
-                            dispatch(setFavLabels(myArr));
-                        }).catch(({ response }) => {
-                            log(response.data.message);
-                            dispatch(setFavLabels([]));
-                        });
-
-                })
-                .catch(({ response }) => {
-                    log('updateBboxAPI-Error', response.data);
-                })
-
-        } else {
-            dispatch(setAutoBox(prevAiBox));
-        }
-
-    }
-
-    const handleClassModifyDone = () => {
-
-        log('--- handle Delete Class Done : Refecth Data Again ---')
-
-        log('activeClassName', activeClassName)
-
-        const myPayload = {
+        const reqData = {
             iteration: currentIter,
-            //class_name: (activeClassName===-1)?'All':(activeClassName===-2)?'Unlabeled':activeClassName,
-            class_name: 'All',
+            class_name: activeClassName,
         }
 
-        log('myPayload--->', myPayload)
+        log('reqData--->',reqData)
 
         //setImgDataList([])
         try {
-            toGetDatasetImgAPI(datasetId, myPayload).then((data) => {
-
-                log('data.data.data.img_path ----->', data.data.data.img_path)
-
-
+            toGetDatasetImgAPI(datasetId, reqData).then((data) => {
+                
+                log('data.data.data.img_path ----->',data.data.data.img_path)
+                
+                
                 setImgDataList(data.data.data.img_path)
 
 
                 dispatch(setCurrentIdx(0));
                 //setDataSetListByClassId(data.data.data.img_path, -1)
-                if (dataType === 'object_detection') {
-
-                    fetchBoxInfoForObjectDetection(imgDataList);
-
-                }
-
-                if (dataType === 'classification') {
-
-                    fetchBoxInfoForClassification(imgDataList);
-
-                }
             })
         } catch (error) {
             log(error)
@@ -1301,13 +1296,13 @@ const AutoLabel = forwardRef((props, ref) => {
         myPayload.threshold = myConfidence;
 
         openAutoLabelingAPI(datasetId, myPayload)
-            .then(({ data }) => {
-                log('openAutoLabelingAPI-OK', data);
-            })
-            .catch(({ response }) => {
-                log('openAutoLabelingAPI-Error', response.data);
-            })
-
+        .then(({ data }) => {
+            log('openAutoLabelingAPI-OK', data);
+        })
+        .catch(({ response }) => {
+            log('openAutoLabelingAPI-Error', response.data);
+        })
+        
 
     }
 
@@ -1315,6 +1310,8 @@ const AutoLabel = forwardRef((props, ref) => {
     useEffect(() => {
         dispatch(openLoading());
 
+
+        log('dataType=============================',dataType)
         // 取得AutoLabeling的狀態
 
         if (dataType === 'classification') {
@@ -1326,14 +1323,7 @@ const AutoLabel = forwardRef((props, ref) => {
 
     useEffect(() => {
 
-        log('currentIdx=============================', currentIdx)
-
-
-    }, [currentIdx]);
-
-    useEffect(() => {
-
-        log('dataType=============================', dataType)
+        log('dataType=============================',dataType)
         // 取得AutoLabeling的狀態
 
         if (dataType === 'object_detection') {
@@ -1364,48 +1354,48 @@ const AutoLabel = forwardRef((props, ref) => {
                     log('--- IterationArr ---')
                     log(IterationArr)
 
-                    if (IterationArr.length > 0) {
+                    if (IterationArr.length>0){
 
                         getAutoLabelingParameterAPI(datasetId)
-                            .then(({ data }) => {
+                        .then(({ data }) => {
 
-                                if (data.data) {
-                                    const myIteration = data.data.iteration;
-                                    const myConfidence = data.data.threshold;
+                            if (data.data) {
+                                const myIteration = data.data.iteration;
+                                const myConfidence = data.data.threshold;
 
-                                    log('--- myIteration ---')
-                                    log(myIteration)
-                                    setDefaultIteration(myIteration)
+                                log('--- myIteration ---')
+                                log(myIteration)
+                                setDefaultIteration(myIteration)
 
-                                    log('--- myConfidence ---')
-                                    log(myConfidence)
-                                    setDefaultConfidence(myConfidence);
-
-
-                                    log('open auto labeling--->')
-                                    openAutoLabelingModel(myIteration, myConfidence)
+                                log('--- myConfidence ---')
+                                log(myConfidence)
+                                setDefaultConfidence(myConfidence);
 
 
+                                log('open auto labeling--->')
+                                openAutoLabelingModel(myIteration, myConfidence)
 
-                                }
-                            })
-                            .catch(({ response }) => {
-                                log('getAutoLabelingParameterAPI-Error', response.data);
-                            })
+
+
+                            }
+                        })
+                        .catch(({ response }) => {
+                            log('getAutoLabelingParameterAPI-Error', response.data);
+                        })
 
                         getAutoLabelStatus()
-                            .then((data) => {
-                                log('myServerAutoLabelStatus', data)
-                                if (data === true) {
-                                    AutoLabelingToggleRef.current.setValue(true);
-                                }
-                                if (data === false) {
-                                    AutoLabelingToggleRef.current.setValue(false);
-                                }
-                            })
+                        .then((data) => {
+                            log('myServerAutoLabelStatus', data)
+                            if (data === true) {
+                                AutoLabelingToggleRef.current.setValue(true);
+                            }
+                            if (data === false) {
+                                AutoLabelingToggleRef.current.setValue(false);
+                            }
+                        })
 
                         setShowAutoLabelPanel(true);
-                    } else {
+                    }else{
                         setShowAutoLabelPanel(false);
                     }
 
@@ -1415,7 +1405,7 @@ const AutoLabel = forwardRef((props, ref) => {
                     log('getIterationAPI-Error', response.data);
                 })
 
-
+        
         }
 
         if (dataType === 'classification') {
@@ -1430,12 +1420,12 @@ const AutoLabel = forwardRef((props, ref) => {
 
         log('image change', imageName)
 
-        if ((imageName !== '') && (dataType === 'object_detection') && (showAutoLabelPanel)) {
+        if ((imageName !== '')&&(dataType==='object_detection')&&(showAutoLabelPanel)) {
 
             const myPayload = {};
             myPayload.image_name = imageName.replace("//", "");
 
-            log('imageName---->', imageName)
+            log('imageName---->',imageName)
 
             // 檢查圖片是否已經做過AutoLabeling
             dispatch(setAutoBox([]));
@@ -1476,8 +1466,6 @@ const AutoLabel = forwardRef((props, ref) => {
                 //keyName="*"
                 onKeyDown={handleKeyDown.bind(this)}
             />
-            <CustomAlert message={showText} type={showType} ref={alertRef} />
-            <UndoAlert message={showText} type={showType} ref={undoAlertRef} onUndo={handleUndoBox} />
             <div className="container-fluid" style={containerStyle}>
                 <div className="row d-flex justify-content-between">
                     <div className="col-8 position-relative" style={leftPanelStyle}>
@@ -1486,10 +1474,10 @@ const AutoLabel = forwardRef((props, ref) => {
 
 
 
-                                <CustomSelectClass defaultValue={0} ref={classSelectorRef} onClassModifyDone={handleClassModifyDone} onClassChange={handleClassChange} onDeleteClass={handleDeleteClass} showDeleteConfirmModal={showDeleteConfirmModal} onAlert={handleAlertShow}></CustomSelectClass>
+                                <CustomSelectClass defaultValue={0} ref={classSelectorRef} onDeleteClassDone={handleDeleteClassDone} onClassChange={handleClassChange}></CustomSelectClass>
 
 
-                                <ClassButtonPanel combinedClass={combinedClass} onClick={handleClassButtonClick} onClassChange={handleClassChange} confirmStatus={confirmStatus}></ClassButtonPanel>
+                                <ClassButtonPanel combinedClass={combinedClass} onClick={handleClassButtonClick} onClassChange={handleClassChange}></ClassButtonPanel>
 
 
 
@@ -1511,7 +1499,7 @@ const AutoLabel = forwardRef((props, ref) => {
 
                                                         <div className="d-flex align-items-center justify-content-center" style={{ height: 'calc(100vh - 312px)', width: 'calc(100vw - 512px)' }}>
                                                             <OutsideClickHandler onOutsideClick={handleOutsideClick}>
-                                                                <AreaContainer areaData={dataSetList[currentIdx]} height={height} width={width} selectedLabelIdx={selectedLabelIdx} confirmStatus={confirmStatus} currentSelectedClass={currentSelectedClass} toolSelect={toolSelect} onBoxChange={handleBoxChange}></AreaContainer>
+                                                                <AreaContainer areaData={dataSetList[currentIdx]} height={height} width={width} selectedLabelIdx={selectedLabelIdx} currentSelectedClass={currentSelectedClass} toolSelect={toolSelect} onBoxChange={handleBoxChange}></AreaContainer>
                                                             </OutsideClickHandler>
                                                         </div>
 
@@ -1626,7 +1614,8 @@ const AutoLabel = forwardRef((props, ref) => {
                                                         </AnnotationItemPanel>
                                                         :
                                                         <div style={descriptionStyle}>
-                                                            Start annotating your images now, easily categorize and organize your content!
+                                                            This is new feature for user can quickly label after do some iterations. Please give it a try. You will find a new world.
+
                                                         </div>
 
                                                 }
@@ -1640,7 +1629,7 @@ const AutoLabel = forwardRef((props, ref) => {
                         </div>
                         {
                             (showAutoLabelPanel) ?
-
+                               
                                 <div className="row">
                                     <div className="col-12 p-0">
                                         <div style={autoLabelingPanelStyle}>
@@ -1660,7 +1649,7 @@ const AutoLabel = forwardRef((props, ref) => {
                                                 </div>
                                                 <div className="row">
                                                     <div className="col-12" style={descriptionStyle}>
-                                                        Simplify your image annotation process and save time with our automated labeling function.
+                                                        This is new feature for user can quickly label after do some iterations. Please give it a try. You will find a new world.
                                                         <span className='my-setting-button' onClick={handleAutoLabelingSetting}>
                                                             Settings.
                                                         </span>
@@ -1819,47 +1808,6 @@ const AutoLabel = forwardRef((props, ref) => {
                                         setShowAutoLabelingSettingModal(false);
                                     }} />
                                     <CustomButton name="save" onClick={handleAutoLabelingParameterUpdate} />
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </ModalDialog>
-            </Modal>
-
-
-
-            <Modal
-                open={showDeleteConfirmModal}
-            >
-                <ModalDialog
-                    sx={{ minWidth: 500, maxWidth: 500, minHeight: 400 }}
-                >
-                    <div className='container-fluid'>
-                        <div className='row'>
-                            <div className='col-12 p-0 my-dialog-title'>
-                                <div>
-                                    Warnning
-                                </div>
-
-                            </div>
-                        </div>
-                        <div className='row'>
-                            <div className='col-12 p-0 my-dialog-parameter'>
-                                <div style={{ paddingTop: 24 }}>
-                                    This class will be deleted immediately. You can't undo this action.
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div className='row'>
-                            <div className='col-12 d-flex justify-content-end' style={{ padding: 0 }}>
-                                <div style={{ paddingTop: 203 }} className='d-flex gap-3'>
-                                    <CustomButton name="cancel" onClick={() => {
-                                        setShowDeleteConfirmModal(false);
-                                    }} />
-                                    <CustomButton name="delete" onClick={handleDeleteClassConfirm} />
 
                                 </div>
                             </div>

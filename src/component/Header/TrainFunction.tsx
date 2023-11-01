@@ -25,7 +25,7 @@ export const TrainBtnWrapperDiv = styled.div`
 display: flex;
 align-items: center;
 justify-content: flex-end;
-width: 658px;
+width: 608px;
 height: 56px;
 
 @media(max-width: 1024px){

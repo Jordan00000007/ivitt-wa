@@ -12,8 +12,8 @@ const StyledOverlay = styled(Overlay)`
 
 const DialogContainer = styled.div`
   border-radius: 12px;
-  min-width: 350px;
-  min-height: 30%;
+  min-width: 200px;
+  min-height: 200px;
   max-width: 40%;
   overflow: auto;
   display: flex;
@@ -58,10 +58,10 @@ const Wrapper = styled.div`
 
 const LoadingTitle = styled.div`
   position: absolute;
-  top: 47%;
-  left: 42%;
+  top: 45%;
+  left: 35%;
   margin: auto;
-  font-size: 15px;
+  font-size: 16px;
 `;
 
 
@@ -77,6 +77,7 @@ const Loading = () => {
           sx={{
             color: (theme) =>
               theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
+           
             position: 'absolute',
             top: 0,
             bottom: 0,
@@ -85,7 +86,7 @@ const Loading = () => {
             margin: 'auto',
           }}
           size={90}
-          thickness={2}
+          thickness={2.5}
           value={100}
         />
         <CircularProgress
@@ -93,7 +94,8 @@ const Loading = () => {
           disableShrink
           sx={{
             color: (theme) => (theme.palette.mode === 'light' ? '#E61F23' : '#E61F23'),
-            animationDuration: '600ms',
+           
+            animationDuration: '1200ms',
             position: 'absolute',
             top: 0,
             bottom: 0,
@@ -105,7 +107,9 @@ const Loading = () => {
             },
           }}
           size={90}
-          thickness={2}
+          thickness={2.5}
+          
+          
         />
       </DialogContainer>
     </Wrapper>

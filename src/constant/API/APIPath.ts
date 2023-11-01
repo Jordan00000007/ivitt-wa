@@ -49,6 +49,8 @@ const APIPath = {
     threshold: (Id: string) => `${apiHost}/${Id}/threshold`,
     confirmStatus: (Id: string) => `${apiHost}/${Id}/confirm_status`,
     autolabelStatus: (Id: string) => `${apiHost}/${Id}/autolabel_status`,
+    clearAutolabeling: (Id: string) => `${apiHost}/${Id}/clear_autolabeling`,
+  
     
   },
   model:{

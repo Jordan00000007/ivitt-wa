@@ -151,13 +151,6 @@ const SliderCard = (props: SliderCardProps) => {
       class_name: activeClassName
     }
 
-    console.log('--- try get image info url ---')
-    console.log('--- currentIter ---')
-    console.log(currentIter)
-    console.log('--- activeClassName ---')
-    console.log(activeClassName)
-
-
     getImgUrlList(datasetId, reqData).then((data) => {
       if (data) setImgDataList(data);
     })

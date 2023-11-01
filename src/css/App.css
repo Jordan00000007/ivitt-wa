@@ -272,7 +272,7 @@
     border: 1px solid #979CB580;
     border-radius: 6px;
     padding: 8px 0px;
-    z-index:10000!important;
+    z-index:10!important;
 
 }
 .my-class-dialog{
@@ -405,6 +405,57 @@
     
 }
 
+.roboto-b1 {
+    font-family: 'Roboto'!important;
+    font-size: 16px!important;
+    font-weight: 300;
+}
+
+.my-alert-message {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: transparent;
+    color: #000;
+    padding: 0px;
+    border: 0px;
+    display: none;
+    margin-bottom: 40px;
+}
+
+.my-undo{
+    color: #F99E3D;
+    padding-top:4px;
+    padding-right: 15px;
+    cursor: pointer;
+}
+
+.my-undo:hover{
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.my-card-title{
+    color:#979CB5;
+    cursor: pointer;
+}
+
+.my-card-title:hover{
+    color:#16272E;
+}
+
+.my-index-tooltip{
+    font-size:16px;
+}    
+
+.my-white-cursor {
+    cursor: url('../assets/Cursor_Arrow.svg') 6 6, auto;
+}
+
+.my-black-cursor {
+    cursor: url('../assets/Cursor_Arrow_Click.svg') 6 6, auto;
+}
 
 .MuiModal-backdrop{
     backdrop-filter: blur(0px)!important;   
@@ -457,3 +508,24 @@
     border-radius: 10px;
 }
 
+.MuiAlert-root{
+    padding: 3px !important;
+} 
+
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.rotating-svg {
+    animation: rotate 5s linear infinite;
+}
+
+
+ 

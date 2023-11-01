@@ -108,7 +108,7 @@ export const useAddNewClass = (datasetId: string, classList: ClassListType[]) =>
   }, [classList, dispatch])
 
   const addClassAPICallback = useCallback((theNewClass: string, colorId: number) => {
-    return addClassAPI(datasetId, { class_name: theNewClass, color_id: colorId })
+    return addClassAPI(datasetId, { class_name: theNewClass, color_id: colorId ,color_hex:''})
       .then((res) => {
         if (res.status === 200) {
           updateList(theNewClass, colorId)

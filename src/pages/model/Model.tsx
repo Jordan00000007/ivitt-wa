@@ -75,8 +75,6 @@ function Model(props: ModelPropsType) {
     setOpenExportDialog(true);
   }
 
-
-
   useEffect(() => {
     // dispatch(closeLoading());
     if (trainingStatus === 'stop' || trainingStatus === 'done') {
