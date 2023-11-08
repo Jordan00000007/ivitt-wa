@@ -27,6 +27,17 @@ const CustomSelectDataset = forwardRef((props, ref) => {
                 styleOverrides: {
                     root: ({ ownerState, theme }) => ({
                         borderColor: '#979CB580',
+                       
+                    }),
+                },
+            },
+            JoyChip: {
+                styleOverrides: {
+                    root: ({ ownerState, theme }) => ({
+                        ...(ownerState.color === 'ivit' && {
+                            color: '#FFFFFF',
+                            backgroundColor: '#E61F23',
+                        }),
                     }),
                 },
             },
@@ -43,9 +54,21 @@ const CustomSelectDataset = forwardRef((props, ref) => {
                     }),
                 },
             },
+            JoyChip: {
+                styleOverrides: {
+                    root: ({ ownerState, theme }) => ({
+                        ...(ownerState.color === 'ivit' && {
+                            color: '#FFFFFF',
+                            backgroundColor: '#E61F23',
+                        }),
+                    }),
+                },
+            },
 
         },
     });
+
+ 
 
     const [placeHolder, setPlaceHolder] = useState(props.placeHolder);
     const [selectedValue, setSelectedValue] = useState('');
@@ -169,7 +192,8 @@ const CustomSelectDataset = forwardRef((props, ref) => {
                     listbox: {
                         sx: {
                             top: '-4px !important',
-                            backgroundColor: '#FAFAFD',
+                            // backgroundColor: '#FAFAFD',
+                            backgroundColor: 'yellow',
                             maxHeight: parseInt(props.height) * 10,
                             
                         },

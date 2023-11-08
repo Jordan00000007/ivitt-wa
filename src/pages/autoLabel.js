@@ -115,6 +115,7 @@ const AutoLabel = forwardRef((props, ref) => {
 
 
     const [toolSelect, setToolSelect] = useState(true);
+    const [toolDisable, setToolDisable] = useState(true);
 
     const [confirmStatus, setConfirmStatus] = useState(false);
 
@@ -176,9 +177,6 @@ const AutoLabel = forwardRef((props, ref) => {
         switch (myClassId) {
             case -1: {
                 setDataSetList(myData);
-
-                log('current dataset list ----------------------->', dataSetList)
-                log('current myData list ----------------------->', myData)
                 break;
             }
             case -2: {
@@ -380,9 +378,12 @@ const AutoLabel = forwardRef((props, ref) => {
                 dispatch(closeLoading());
 
             })
-            .catch((error) => {
-                log(error);
-            });
+            .catch(({ response }) => {
+                log('getBboxAPI-Error', response.data);
+                setShowType(1);
+                setShowText(response.data.message);
+                alertRef.current.setShowTrue(3000);
+            })
 
     }
 
@@ -440,6 +441,11 @@ const AutoLabel = forwardRef((props, ref) => {
         try {
             toGetDatasetImgAPI(datasetId, myPayload).then((data) => {
                 setImgDataList(data.data.data.img_path)
+            }).catch(({ response }) => {
+                log('toGetDatasetImgAPI-Error', response.data);
+                setShowType(1);
+                setShowText(response.data.message);
+                alertRef.current.setShowTrue(3000);
             })
         } catch (error) {
             log(error)
@@ -466,6 +472,11 @@ const AutoLabel = forwardRef((props, ref) => {
 
                 dispatch(setClassInfo(myClassInfo));
 
+            }).catch(({ response }) => {
+                log('toGetClassAndNumberAPI-Error', response.data);
+                setShowType(1);
+                setShowText(response.data.message);
+                alertRef.current.setShowTrue(3000);
             })
         } catch (error) {
             log(error)
@@ -490,7 +501,8 @@ const AutoLabel = forwardRef((props, ref) => {
     const pagePanelStyle = { backgroundColor: 'white', width: 132, height: 33, border: '1px solid #979CB580', borderRadius: '6px 6px 0px 0px', padding: '5px 8px 4px 8px' };
     const annotationPanelStyle = { backgroundColor: 'white', width: 300, height: 280, borderBottom: '1px solid #979CB580' };
     const autoLabelingPanelStyle = { backgroundColor: 'white', width: 300, height: 150, borderBottom: '1px solid #979CB580' };
-    const datasetPanelStyle = { backgroundColor: 'white', width: 300, height: 'calc(100vh - 486px)' };
+    const datasetPanelStyle1 = { backgroundColor: 'white', width: 300, height: 'calc(100vh - 486px)' };
+    const datasetPanelStyle2 = { backgroundColor: 'white', width: 300, height: 'calc(100vh - 336px)' };
     const panelTitleStyle = { fontFamily: 'Roboto, Medium', fontSize: 18, color: '#16272E', fontWeight: 500, padding: '16px 20px 10px 20px', width: 300 };
     const classItemStyle = { fontFamily: 'Roboto, Regular', fontSize: 15, color: '#16272E', padding: '9px 20px', width: 300, height: 36 };
     const descriptionStyle = { padding: '0px 20px', color: '#979CB5', fontSize: 13 };
@@ -559,6 +571,9 @@ const AutoLabel = forwardRef((props, ref) => {
             })
             .catch(({ response }) => {
                 log('getAutoLabelingParameterAPI-Error', response.data);
+                setShowType(1);
+                setShowText(response.data.message);
+                alertRef.current.setShowTrue(3000);
             })
 
     }
@@ -725,6 +740,9 @@ const AutoLabel = forwardRef((props, ref) => {
             })
             .catch(({ response }) => {
                 log('modifyAutoLabelingParameterAPI-Error', response.data);
+                setShowType(1);
+                setShowText(response.data.message);
+                alertRef.current.setShowTrue(3000);
             })
 
 
@@ -779,6 +797,9 @@ const AutoLabel = forwardRef((props, ref) => {
                 })
                 .catch(({ response }) => {
                     log('updateBboxAPI-Error', response.data);
+                    setShowType(1);
+                    setShowText(response.data.message);
+                    alertRef.current.setShowTrue(3000);
                 })
 
 
@@ -853,6 +874,9 @@ const AutoLabel = forwardRef((props, ref) => {
                     })
                     .catch(({ response }) => {
                         log('confirmStatusAPI-Error', response.data);
+                        setShowType(1);
+                        setShowText(response.data.message);
+                        alertRef.current.setShowTrue(3000);
                     })
 
 
@@ -1020,6 +1044,10 @@ const AutoLabel = forwardRef((props, ref) => {
             })
             .catch(({ response }) => {
                 log('updateBboxAPI-Error', response.data);
+
+                setShowType(1);
+                setShowText(response.data.message);
+                alertRef.current.setShowTrue(3000);
             })
 
         log('myBox')
@@ -1085,11 +1113,19 @@ const AutoLabel = forwardRef((props, ref) => {
 
                             }).catch(({ response }) => {
                                 log('toGetClassAndNumberAPI-Error', response.data);
+
+                                setShowType(1);
+                                setShowText(response.data.message);
+                                alertRef.current.setShowTrue(3000);
                             });
 
 
                     }).catch(({ response }) => {
                         log('addClassAPI-Error', response.data);
+
+                        setShowType(1);
+                        setShowText(response.data.message);
+                        alertRef.current.setShowTrue(3000);
                     });
             }
         })
@@ -1108,6 +1144,10 @@ const AutoLabel = forwardRef((props, ref) => {
                 .catch(({ response }) => {
                     log('getAutoLabelStatus-Error', response.data);
                     reject('getAutoLabelStatus-Error');
+
+                    setShowType(1);
+                    setShowText(response.data.message);
+                    alertRef.current.setShowTrue(3000);
                 })
         })
     }
@@ -1122,6 +1162,10 @@ const AutoLabel = forwardRef((props, ref) => {
                 .catch(({ response }) => {
                     log('setAutoLabelStatus-Error', response.data);
                     reject('setAutoLabelStatus-Error');
+
+                    setShowType(1);
+                    setShowText(response.data.message);
+                    alertRef.current.setShowTrue(3000);
                 })
         })
     }
@@ -1178,11 +1222,20 @@ const AutoLabel = forwardRef((props, ref) => {
                     })
                     .catch(({ response }) => {
                         log('thresholdAPI-Error', response.data);
+
+                        setShowType(1);
+                        setShowText(response.data.message);
+                        alertRef.current.setShowTrue(3000);
                     })
 
             })
             .catch(({ response }) => {
                 log('inferAutoLabelingAPI-Error', response.data);
+
+                setShowType(1);
+                setShowText(response.data.message);
+                alertRef.current.setShowTrue(3000);
+
             })
     }
 
@@ -1224,6 +1277,10 @@ const AutoLabel = forwardRef((props, ref) => {
                 })
                 .catch(({ response }) => {
                     log('updateBboxAPI-Error', response.data);
+
+                    setShowType(1);
+                    setShowText(response.data.message);
+                    alertRef.current.setShowTrue(3000);
                 })
 
         } else {
@@ -1306,6 +1363,10 @@ const AutoLabel = forwardRef((props, ref) => {
             })
             .catch(({ response }) => {
                 log('openAutoLabelingAPI-Error', response.data);
+
+                setShowType(1);
+                setShowText(response.data.message);
+                alertRef.current.setShowTrue(3000);
             })
 
 
@@ -1413,6 +1474,10 @@ const AutoLabel = forwardRef((props, ref) => {
                 })
                 .catch(({ response }) => {
                     log('getIterationAPI-Error', response.data);
+
+                    setShowType(1);
+                    setShowText(response.data.message);
+                    alertRef.current.setShowTrue(3000);
                 })
 
 
@@ -1424,6 +1489,17 @@ const AutoLabel = forwardRef((props, ref) => {
 
 
     }, [datasetId]);
+
+    useEffect(() => {
+
+        if (classInfo.length===0){
+            setToolDisable(true);
+        }else{
+            setToolDisable(false);
+        }
+      
+
+    }, [classInfo]);
 
 
     useEffect(() => {
@@ -1460,6 +1536,10 @@ const AutoLabel = forwardRef((props, ref) => {
                 })
                 .catch(({ response }) => {
                     log('confirmStatusAPI-Error', response.data);
+
+                    setShowType(1);
+                    setShowText(response.data.message);
+                    alertRef.current.setShowTrue(3000);
                 })
 
         }
@@ -1562,12 +1642,12 @@ const AutoLabel = forwardRef((props, ref) => {
                                             <div style={toolPanelStyle}>
                                                 <div style={{ width: 48, height: 48, padding: 0, position: 'relative' }} className='d-flex justify-content-center align-items-center' onClick={handleSelectLabel}>
                                                     <DrawingTooltip title="Select . Draw" keyword="S">
-                                                        <Icon_Point className={toolSelect ? 'my-tool-icon-select-selected' : 'my-tool-icon-select'} onClick={handleSelectLabel}></Icon_Point>
+                                                        <Icon_Point className={(toolDisable)?'my-tool-icon-select-disabled':toolSelect ? 'my-tool-icon-select-selected' : 'my-tool-icon-select'} onClick={handleSelectLabel}></Icon_Point>
                                                     </DrawingTooltip>
                                                 </div>
                                                 <div style={{ width: 48, height: 48, padding: 0, position: 'relative' }} className='d-flex justify-content-center align-items-center' onClick={handleDeleteLabel} name="deleteLabel">
-                                                    <DrawingTooltip title="Delete" keyword="delete">
-                                                        <Icon_Delete className='my-tool-icon-delete' name="deleteLabel"></Icon_Delete>
+                                                    <DrawingTooltip title="Delete" keyword="Delete">
+                                                        <Icon_Delete className={(toolDisable)?'my-tool-icon-delete-disabled':'my-tool-icon-delete'} name="deleteLabel"></Icon_Delete>
                                                     </DrawingTooltip>
 
                                                 </div>
@@ -1608,7 +1688,8 @@ const AutoLabel = forwardRef((props, ref) => {
 
 
                                                     ((currentBbox.length > 0) || (autoBox.length > 0)) ?
-                                                        <AnnotationItemPanel className="container">
+                                                        <div className="container" style={{padding:'0px 12px 0px 0px'}}>
+                                                            <div className="my-annotation-panel">
                                                             {
                                                                 currentBbox.map((item, idx) => (
                                                                     // <AnnotationItem key={`Label_${idx}`} labelIdx={idx} selectedLabelIdx={selectedLabelIdx} name={item.class_name} color={item.color_hex} filled={true} onClick={handleItemSelected}></AnnotationItem>
@@ -1623,7 +1704,8 @@ const AutoLabel = forwardRef((props, ref) => {
                                                                 ))
 
                                                             }
-                                                        </AnnotationItemPanel>
+                                                            </div>
+                                                        </div>
                                                         :
                                                         <div style={descriptionStyle}>
                                                             Start annotating your images now, easily categorize and organize your content!
@@ -1676,14 +1758,14 @@ const AutoLabel = forwardRef((props, ref) => {
 
                         <div className="row">
                             <div className="col-12 p-0">
-                                <div style={datasetPanelStyle}>
+                                <div style={(showAutoLabelPanel)?datasetPanelStyle1:datasetPanelStyle2}>
                                     <div className="container">
                                         <div className="row">
                                             <div className="col-12 d-flex flex-row justify-content-between" style={panelTitleStyle}>
-                                                Dateset
+                                                Dataset
 
                                                 <div>
-                                                    <CustomSelectDataset dataArr={combinedClassSelectorArr} width="122" height="28" fontSize="16" onChange={handleDatatSetFilterChange} name="DatasetFilter" defaultValue={activeClassName} unlabeledCount={unlabeledCount}></CustomSelectDataset>
+                                                    <CustomSelectDataset dataArr={combinedClassSelectorArr} width="160" height="28" fontSize="16" onChange={handleDatatSetFilterChange} name="DatasetFilter" defaultValue={activeClassName} unlabeledCount={unlabeledCount}></CustomSelectDataset>
                                                 </div>
                                             </div>
 
@@ -1702,7 +1784,7 @@ const AutoLabel = forwardRef((props, ref) => {
                                                                     height={height}
                                                                     rowCount={Math.ceil(dataSetList.length / 3)}
                                                                     rowHeight={80 + GUTTER_SIZE}
-                                                                    width={width}
+                                                                    width={width-3}
                                                                     ref={gridRef}
                                                                     initialScrollTop={(currentIdx > 12) ? Math.floor(currentIdx / 3) * 90 : 0}
 
@@ -1714,7 +1796,8 @@ const AutoLabel = forwardRef((props, ref) => {
                                                                             className="my-grid-item"
                                                                             style={{
                                                                                 ...style,
-                                                                                backgroundColor: '#f1f1f1',
+                                                                                // backgroundColor: '#f1f1f1',
+                                                                                backgroundColor: ((columnIndex + rowIndex * 3) < dataSetList.length) ?'#f1f1f1':'#fff',
                                                                                 border: '0px solid #979CB580',
                                                                                 left: style.left + GUTTER_SIZE,
                                                                                 top: style.top + GUTTER_SIZE,
@@ -1839,7 +1922,7 @@ const AutoLabel = forwardRef((props, ref) => {
                         <div className='row'>
                             <div className='col-12 p-0 my-dialog-title'>
                                 <div>
-                                    Warnning
+                                    Warning
                                 </div>
 
                             </div>

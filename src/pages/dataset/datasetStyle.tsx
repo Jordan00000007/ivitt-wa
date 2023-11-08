@@ -23,10 +23,12 @@ export const ControlBtnContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
 `;
 
 export const StyledUploadBtn = styled(StyledBtnRed)`
   margin-left: 12px;
+  padding: 5px 10px 4px 12px!important;
 `;
 
 export const StyledMoreButton = styled(MoreButton)`
@@ -124,6 +126,7 @@ export const PhotoFrame = styled.div<{ active: boolean }>`
          bottom: 0;
          z-index: 1;
          background: #FFFFFF66;
+         border: 2px solid #FF1111;
         }
    } 
    

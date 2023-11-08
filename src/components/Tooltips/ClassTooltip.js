@@ -23,8 +23,9 @@ const ClassTooltip = ({ children, title, keyword,expandClassMenu }) => {
                         display: 'flex',
                         flexDirection: 'column',
                         maxWidth: 206,
-                        justifyContent: 'center',
+                        justifyContent: 'top',
                         p: 1,
+                        minHeight:160,
                     }}
                 >
                     <Typography

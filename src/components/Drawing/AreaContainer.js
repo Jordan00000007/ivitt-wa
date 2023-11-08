@@ -1,11 +1,10 @@
 import log from "../../utils/console";
 import { getMediaSize, checkPointInRect, getBboxFromRbox } from "../../utils/geometric";
 
-import React, { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
+import React, { useState, useEffect, useImperativeHandle, forwardRef, useRef, useContext } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Circle, Rect, Layer, Line, Stage, Image, Label, Text, Tag, Group, Draggable, useStrictMode, Transformer } from "react-konva";
 
-import Konva from 'konva';
 import useImage from "use-image";
 import { apiHost } from '../../constant/API/APIPath';
 import { updateBboxAPI, getBboxAPI, favoriteLabelAPI } from '../../constant/API';
@@ -22,11 +21,11 @@ import { selectCurrentClassInfo, setClassSelectedIndex, setFavLabels } from "../
 const AreaContainer = forwardRef((props, ref) => {
 
 
-    const [currentSize, setCurrentSize] = React.useState({ "width": 0, "height": 0 });
+    const [currentSize, setCurrentSize] = useState({ "width": 0, "height": 0 });
+    const [hoverBbox, setHoverBbox] = useState([]);
+    const [mouseCursorClass, setMouseCursorClass] = useState('my-white-cursor');
 
-    const [hoverBbox, setHoverBbox] = React.useState([]);
-
-    const { datasetId, dataType } = React.useContext(MainContext);
+    const { datasetId, dataType } = useContext(MainContext);
 
     const sizeInfo = useSelector(selectCurrentBbox).sizeInfo;
     const currentBbox = useSelector(selectCurrentBbox).bbox;
@@ -37,9 +36,6 @@ const AreaContainer = forwardRef((props, ref) => {
 
     const classInfo = useSelector(selectCurrentClassInfo).classInfo;
     const classSelectedIndex = useSelector(selectCurrentClassInfo).classSelectedIndex;
-
-
-
 
     const [image] = useImage((props.areaData.img_path) ? `${apiHost}/display_img/${props.areaData.img_path.replace("./", "/")}` : '');
 
@@ -87,7 +83,7 @@ const AreaContainer = forwardRef((props, ref) => {
     const handleLayerClick = (e) => {
 
         log('layer click')
-       // window.document.body.classList.add('my-black-cursor')
+        // window.document.body.classList.add('my-black-cursor')
 
         if ((props.toolSelect) && (dataType === 'object_detection')) {
 
@@ -98,23 +94,8 @@ const AreaContainer = forwardRef((props, ref) => {
 
             const areaResult = checkAreaIntersect(sx, sy);
 
-            log('areaResult')
-            log(areaResult)
-
-            //const container = stageRef.current.container();
-
             const container = e.target.getStage().container();
 
-
-            if ((areaResult.length) === 0) {
-                
-                container.className='my-white-cursor';
-            }else{
-                
-                container.className='my-black-cursor';
-            }
-
-           
 
             if ((areaResult.length) === 0) {
                 dispatch(setLabelIndex(-1));
@@ -136,7 +117,7 @@ const AreaContainer = forwardRef((props, ref) => {
                     dispatch(setAiLabelIndex(myIdx));
                 }
 
-              
+
 
             }
             else if ((areaResult.length) > 1) {
@@ -175,7 +156,7 @@ const AreaContainer = forwardRef((props, ref) => {
                     }
                 }
 
-               
+
             }
 
 
@@ -183,21 +164,19 @@ const AreaContainer = forwardRef((props, ref) => {
 
     }
 
-    const handleLayerMouseDown = (e) => {
+    
 
-        //window.document.body.classList.remove('my-white-cursor');
-        window.document.body.classList.add('my-black-cursor');
-      
+    const handleMouseCursorChange = (e) => {
+
+       
+        setMouseCursorClass(prevState => {
+            if (prevState === 'my-black-cursor') {
+                return 'my-white-cursor';
+            }
+            return 'my-black-cursor';
+        });
+
     }
-
-    const handleLayerMouseUp = (e) => {
-
-        //window.document.body.classList.add('my-white-cursor');
-        window.document.body.classList.remove('my-black-cursor');
-      
-    }
-
-
 
     useEffect(() => {
 
@@ -405,9 +384,9 @@ const AreaContainer = forwardRef((props, ref) => {
 
     const handleMouseDown = event => {
 
-       
-        
-        if ((newAnnotation.length === 0) && (labelIndex < 0) && (aiLabelIndex < 0) && (props.toolSelect) && (classSelectedIndex>=0)) {
+
+
+        if ((newAnnotation.length === 0) && (labelIndex < 0) && (aiLabelIndex < 0) && (props.toolSelect) && (classSelectedIndex >= 0)) {
             const { x, y } = event.target.getStage().getPointerPosition();
             setNewAnnotation([{ x, y, width: 0, height: 0, key: "newArea" }]);
 
@@ -530,16 +509,16 @@ const AreaContainer = forwardRef((props, ref) => {
             //log('areaResult --->',areaResult)
             const container = event.target.getStage().container();
 
-            if ((areaResult.length) === 0) {
-                
-                container.className='my-white-cursor';
-            }else{
-                
-                container.className='my-black-cursor';
-            }
+            // if ((areaResult.length) === 0) {
+
+            //     container.className='my-white-cursor';
+            // }else{
+
+            //     container.className='my-black-cursor';
+            // }
 
             setHoverBbox(areaResult)
-        }        
+        }
     };
 
     const handleMouseLeave_xx = event => {
@@ -622,9 +601,13 @@ const AreaContainer = forwardRef((props, ref) => {
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             ref={stageRef}
+            className={mouseCursorClass}
+
         >
-            <Layer onClick={handleLayerClick} 
-               
+            <Layer onClick={handleLayerClick}
+                onMouseDown={handleMouseCursorChange}
+                onMouseUp={handleMouseCursorChange}
+                
             >
 
                 <Image image={image} width={currentSize.width} height={currentSize.height} />

@@ -148,7 +148,7 @@ const ProjectCard = (props: ProjectCardProps) => {
           />
         </Head>
         <ProjectTag className={'blue'} text={data.platform} />
-        <ProjectTag className={'green'} text={data.type} />
+        <ProjectTag className={'green'} text={(data.type==='classification')?'Classification':(data.type==='object_detection')?'Object Detection':data.type} />
         {!data.coverImg ?
           <NoCoverPhoto><NoImgIcon /></NoCoverPhoto>
           : <CoverPhotoFrame>

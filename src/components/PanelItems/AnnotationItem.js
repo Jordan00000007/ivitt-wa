@@ -108,14 +108,14 @@ const AnnotationItem = forwardRef((props, ref) => {
     }, [aiLabelIndex,labelIndex]);
 
     return (
-        <div className="row" onClick={(evt)=>handleItemClick(props.ai)}>         
-            <div className={`col-12 d-flex flex-row align-items-center ${selected?'my-annotation-item-selected':'my-annotation-item'}`} >
+        <div className={`row ${selected?'my-annotation-item-selected':'my-annotation-item'}`} onClick={(evt)=>handleItemClick(props.ai)}>         
+            <div className={`col-12 d-flex flex-row align-items-center `} >
                 {
                     (props.ai) ?
                         
                         <Label_AI stroke={getClassColor(props.className)}></Label_AI>
                         :
-                        <Label_Man fill={getClassColor(props.className)} ></Label_Man>
+                        <Label_Man fill={getClassColor(props.className)}></Label_Man>
                 }
                 <div style={{ paddingLeft: 10 }}>
                     {props.className}

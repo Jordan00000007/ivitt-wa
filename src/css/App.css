@@ -5,16 +5,17 @@
 .my-grid-panel::-webkit-scrollbar {
     width: 6px;
     height: 6px;
+    margin: 0 5px!important;
 }
 
 .my-grid-panel::-webkit-scrollbar-track {
-    margin: 2px;
     border-radius: 10px;
-    background: rgba(224, 225, 230, 0.376);
+    background: rgba(224, 225, 230, 0.376); 
 }
 
 .my-grid-panel::-webkit-scrollbar-thumb {
-    background: rgb(224, 225, 230);
+    /* background: rgb(224, 225, 230); */
+    background: #d0d0d0 ;
     border-radius: 10px;
 }
 
@@ -25,6 +26,29 @@
     border:'1px solid #979CB580';
 }
 
+.my-annotation-panel{
+    height: 215px;
+    width: 297px;
+    overflow-y: scroll;
+    overflow-x: hidden; 
+}
+.my-annotation-panel::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.my-annotation-panel::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: rgba(224, 225, 230, 0.376); 
+    
+}
+.my-annotation-panel::-webkit-scrollbar-thumb {
+    background: #d0d0d0 ;
+    border-radius: 10px;
+}
+
+
+
 .my-thumb-image:hover {
     background-color: white;
     opacity: 0.6;
@@ -34,8 +58,8 @@
     font-family: Roboto;
     font-size: 15px;
     color: #16272E;  
-    padding: 9px 20px 9px 20px;
-    width: 293px;
+    padding: 9px 20px 9px 18px;
+    width: 300px;
     height: 36px;
     cursor: pointer;
    
@@ -45,8 +69,8 @@
     font-family: Roboto;
     font-size: 15px;
     color: #16272E;  
-    padding: 9px 20px 9px 20px;
-    width: 293px;
+    padding: 9px 20px 9px 18px;
+    width: 300px;
     height: 36px;
     cursor: pointer;
     background-color: #E0F0FA;
@@ -78,12 +102,30 @@
     transform: rotate(-90deg);
     fill : #57B8FF;
 }
+
+.my-tool-icon-select-disabled{
+    position: absolute;
+    left: 6px;
+    cursor: default;
+    transform: rotate(-90deg);
+    fill : #ccc;
+}
+
 .my-tool-icon-delete {
     position: absolute;
     left: 6px;
     cursor: pointer;
     fill : #000000;
 }
+
+.my-tool-icon-delete-disabled {
+    position: absolute;
+    left: 6px;
+    cursor: default;
+    fill : #ccc;
+}
+
+
 .my-tool-icon-delete:hover {
     fill : #57B8FF;
 }
@@ -95,6 +137,14 @@
     letter-spacing: 0px;
     color: #E61F23;
     cursor: pointer;
+}
+
+.my-delete-row {
+    cursor:pointer;
+ }
+
+.my-delete-row:hover {
+   background-color: #E0F0FA;
 }
 
 .my-input-group { 
@@ -282,6 +332,7 @@
     box-shadow: 0px 3px 8px #00000029;
     border: 1px solid #979CB53D;
     border-radius: 6px;
+
 }
 .my-class-dialog .react-colorful {
     height: 180px;
@@ -295,13 +346,13 @@
     height: 20px;
     border-radius: 10px;
 }
-.my-divider {
-    /*color: #979CB53D*/
+
+hr.my-divider {
     color: #979CB580;
     height:1px;
-    border-width:0px;
-    margin-top:15px;
-    margin-bottom:10px;
+    border-width:1px;
+    margin-top:12px;
+    margin-bottom:6px;
     
 }
 
@@ -328,8 +379,30 @@
 .my-setting-button{
     padding-left: 5px;
     font-size : 13px;
+    font-weight: 500;
     color: #57B8FF;
     cursor: pointer;
+}
+
+.my-text-input {
+    /* width: 240px !important; */
+    border: 1px solid #979CB580;
+    border-radius: 6px !important;
+}
+
+.my-text-input:focus {
+    border-color: #979CB5 !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+}
+
+.my-text-input:disabled {
+   background: white!important;
+}
+
+.my-text-input:hover {
+    border-color: #979CB5 !important;
 }
 
 .my-setting-button:hover{
@@ -479,7 +552,8 @@
 }
 
 .MuiOption-root:hover {
-    background-color: #979CB529 !important;
+    /* background-color: #979CB529 !important; */
+    background-color: #E0F0FA!important;
 }
 
 .MuiSelect-listbox {
@@ -500,7 +574,8 @@
 .MuiSelect-listbox::-webkit-scrollbar-track {
     margin: 2px;
     border-radius: 10px;
-    background: rgba(224, 225, 230, 0.376);
+    background: rgba(224, 225, 230, 0.376); 
+   
 }
 
 .MuiSelect-listbox::-webkit-scrollbar-thumb {

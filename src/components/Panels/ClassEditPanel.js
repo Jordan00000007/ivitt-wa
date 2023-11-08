@@ -41,6 +41,8 @@ const ClassEditPanel = forwardRef((props, ref) => {
     const autoBox = useSelector(selectCurrentBbox).autobox;
     const imageName = useSelector(selectCurrentBbox).imageName;
 
+    const inputRef = useRef();
+
     
     useImperativeHandle(ref, () => ({
 
@@ -117,9 +119,7 @@ const ClassEditPanel = forwardRef((props, ref) => {
 
         try {
 
-            // if (classSelectedIndex===classEditingIndex){
-            //     dispatch(setClassSelectedIndex(-1));
-            // }
+        
 
             dispatch(setClassSelectedIndex(-1));
 
@@ -255,7 +255,8 @@ const ClassEditPanel = forwardRef((props, ref) => {
 
     useEffect(() => {
 
-
+        if (inputRef.current)
+        inputRef.current.setFocus();
 
     }, []);
 
@@ -267,7 +268,7 @@ const ClassEditPanel = forwardRef((props, ref) => {
                 <div className='container'>
                     <div className='row' style={{ padding: 10 }}>
                         <div className='col-12 p-0'>
-                            <CustomInput width="180" height="34" defaultValue={classInfo[classEditingIndex].class_name} onChange={handleTextChange} onAlert={props.onAlert}></CustomInput>
+                            <CustomInput width="180" height="34" defaultValue={classInfo[classEditingIndex].class_name} onChange={handleTextChange} onAlert={props.onAlert} ref={inputRef}></CustomInput>
                         </div>
                     </div>
                     <div className='row' style={{ padding: 0 }}>
@@ -284,10 +285,10 @@ const ClassEditPanel = forwardRef((props, ref) => {
                 </div>
 
                 <hr className='my-divider'></hr>
-                <div className='container'>
-                    <div className='row' style={{ paddingTop: 0, paddingLeft: 10, paddingRight: 10 }}>
-                        <div className='col-12 p-0'>
-                            <div className='my-delete-button' onClick={handleClasssDelete}>Delete</div>
+                <div className='container my-delete-row mb-1' onClick={handleClasssDelete} >
+                    <div className='row' style={{ paddingTop: 0, paddingLeft: 10, paddingRight: 10,height:36 }} >
+                        <div className='col-12 p-0 d-flex  align-self-center'>
+                            <div className='my-delete-button' >Delete</div>
                         </div>
                     </div>
                 </div>

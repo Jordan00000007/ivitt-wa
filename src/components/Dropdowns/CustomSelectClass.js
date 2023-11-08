@@ -612,7 +612,7 @@ const CustomSelectClass = forwardRef((props, ref) => {
         <div style={{ width: 240, height: 52 }}>
             <ClassTooltip expandClassMenu={expandClassMenu}>
                 <div className="my-input-group" >
-                    <input type="text" className="my-source-input" aria-label="Text input with dropdown button" placeholder='--- please select ---'
+                    <input type="text" className="my-source-input" aria-label="Text input with dropdown button" placeholder={(classInfo.length === 0) ? '--- Type to create ---':'--- Please select ---'}
                         onChange={(evt) => handleSelectedInputChange(evt.target.value)}
                         onFocus={handleClassFocus}
                         value={(classSelectedIndex === -1) ? ((classEditingIndex === -2) ? currentClassInput : '') : (classInfo[classSelectedIndex] === undefined) ? '' : classInfo[classSelectedIndex].class_name}

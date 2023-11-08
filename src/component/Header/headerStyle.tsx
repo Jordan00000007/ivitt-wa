@@ -66,6 +66,7 @@ export const HeaderContent = styled.div`
     left: 60px;
     position: absolute;
   }
+  
 `;
 
 export const HeaderContentLabel = styled.div`
@@ -74,7 +75,7 @@ export const HeaderContentLabel = styled.div`
   align-items: center;
   height: 56px;
   background-color: ${props => props.theme.color.highlight_1};
- 
+  
 `;
 
 export const Logo = styled.img`
@@ -172,6 +173,19 @@ export const FullTitleLabel = styled.div`
   height: fit-content;
   font-size: ${props => props.theme.typography.h4};
   cursor: default;
+  color:'yellow';
+  justify-content: start;
+  align-items: center;
+  text-transform: capitalize;
+  overflow: visible;
+`;
+
+export const FullTitleLabel2 = styled.div`
+  display: flex;
+  width: fit-content;
+  height: fit-content;
+  font-size: ${props => props.theme.typography.h4};
+  cursor: cursor;
   color:'yellow';
   justify-content: start;
   align-items: center;

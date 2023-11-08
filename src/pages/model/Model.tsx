@@ -87,7 +87,7 @@ function Model(props: ModelPropsType) {
     <>
       <Title>Model
         <div style={{ position: 'absolute', left: '7%', top: '-13.5%' }}>
-          <ProjectTag className={'green'} text={dataType} />
+          <ProjectTag className={'green'} text={(dataType==='classification')?'Classification':(dataType==='object_detection')?'Object Detection':dataType}  />
         </div>
         <StyledBtnRed
           ref={bestModelRef}

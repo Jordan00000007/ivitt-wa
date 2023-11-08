@@ -75,6 +75,7 @@ const PhotoFrameItem = (props: PhotoFrameProps) => {
       {isWorkspace ?
         <PhotoFrame key={hoveredIndex} id={String(hoveredIndex)}
           active={selectPhotoList.length >= 0 && openDeleteTab ? false : hoveredIndex === currIndex}
+          
           onMouseLeave={() => onMouseLeave()}
           onMouseOver={() => onMouseOver(hoveredIndex)}
           className={idSelectMap[hoveredIndex] ? 'addBlur' : ''}
@@ -94,6 +95,7 @@ const PhotoFrameItem = (props: PhotoFrameProps) => {
         :
         <PhotoFrame key={hoveredIndex} id={String(hoveredIndex)}
           active={hoveredIndex === currIndex}
+          
           onClick={(e: any) => handleImgClick(e)}
          
         >

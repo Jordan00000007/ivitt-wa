@@ -301,14 +301,7 @@ function Dataset(props: DatasetPropsType) {
     checkCardNumber(projectData, currentIter)
   }, [currentIter, checkCardNumber, projectData]);
 
-  // useEffect(() => {
 
-  //   console.log('current index...')
-  //   console.log(currentIdx)
-
-
-  //   setCurrentIdx(currentIdx)
-  // }, [currentIdx]);
 
 
   useEffect(() => {
@@ -322,25 +315,6 @@ function Dataset(props: DatasetPropsType) {
   useEffect(() => {
     if (selectPhotoList.length > 0) setOpenDeleteTab(true)
   }, [selectPhotoList.length]);
-
-  // useEffect(() => {
-  //   if (currIndex + 1 > imgDataList.length) {
-  //     console.log('reset index to 0')
-  //     setCurrIndex(0)
-  //   }
-  // }, [currIndex, imgDataList.length]);
-
-  // useEffect(() => {
-
-  //   console.log('current index...')
-  //   console.log(currentIdx)
-  //   setCurrIndex(currentIdx)
-
-  //   //dispatch(setCurrentIdx(currIndex));
-
-
-
-  // }, [currIndex]);
 
 
   useEffect(() => {
@@ -368,7 +342,7 @@ function Dataset(props: DatasetPropsType) {
         }}>
         <Title>Dataset
           <div style={{ position: 'absolute', left: '94px', top: '-3.5px' }}>
-            <ProjectTag className={'green'} text={dataType} />
+            <ProjectTag className={'green'} text={(dataType==='classification')?'Classification':(dataType==='object_detection')?'Object Detection':dataType} />
           </div>
           <ControlBtnContainer>
             <StyledMoreButton

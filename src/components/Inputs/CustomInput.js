@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useEffect, useImperativeHandle } from "react";
+import React, { useState, forwardRef, useEffect, useImperativeHandle,useRef } from "react";
 import log from "../../utils/console";
 
 
@@ -7,6 +7,8 @@ const CustomInput = forwardRef((props, ref) => {
     const [inputValue, setInputValue] = useState('');
     const [warnning, setWarnning] = useState(false);
     // const { ref1, ref2 } = ref;
+
+    const inputRef=useRef();
 
     const handleTextChange = (evt) => {
 
@@ -34,6 +36,9 @@ const CustomInput = forwardRef((props, ref) => {
         },
         setWarnning: (myValue) => {
             setWarnning(myValue);
+        },
+        setFocus: () => {
+            inputRef.current.focus();
         }
     }));
 
@@ -57,6 +62,7 @@ const CustomInput = forwardRef((props, ref) => {
                 value={inputValue}
                 onChange={handleTextChange}
                 style={{ width: parseInt(props.width), height: parseInt(props.height) }}
+                ref={inputRef}
 
             >
 

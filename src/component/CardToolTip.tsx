@@ -13,6 +13,7 @@ const CustomTooltip = styled((props: TooltipProps) => <Tooltip classes={{ popper
     font-size:16px;
     font-weight: 300;
     font-family: roboto;
+    padding: 10px 15px 10px 15px;
   }
   & .MuiTooltip-arrow {
     color:  #16272ECC;

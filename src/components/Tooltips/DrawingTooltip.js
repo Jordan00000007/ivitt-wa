@@ -16,7 +16,7 @@ const DrawingTooltip = ({ children, title, keyword }) => {
                                 {title}
                             </Chip>
 
-                            <Box sx={{ backgroundColor: '#979CB5', width: keyword === 'delete' ? '48px' : '20px', height: '20px', padding: '0px 0px 0px 6px', borderRadius: '4px', mt: 0, fontSize: '13px' }}>{keyword}</Box>
+                            <Box sx={{ backgroundColor: '#979CB5', width: keyword === 'Delete' ? '48px' : '20px', height: '20px', padding: '0px 0px 0px 6px', borderRadius: '4px', mt: 0, fontSize: '13px' }}>{keyword}</Box>
                         </Box>
 
                     }

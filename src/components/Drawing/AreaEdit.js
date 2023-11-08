@@ -2,12 +2,11 @@ import log from "../../utils/console";
 import { getMediaSize, getRboxFromBbox, getBboxFromRbox } from "../../utils/geometric";
 import React, { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Circle, Rect, Layer, Line, Stage, Image, Label, Text, Tag, Group, Draggable, useStrictMode, Transformer } from "react-konva";
+import { Rect, Transformer } from "react-konva";
 import Konva from 'konva';
 import useImage from "use-image";
 import { apiHost } from '../../constant/API/APIPath';
 import { map, filter, cloneDeep, findIndex } from 'lodash-es';
-import moment from 'moment';
 
 import { selectCurrentBbox, setLabelIndex, setAiLabelIndex, setCurrentBbox, setAutoBox } from "../../redux/store/slice/currentBbox";
 import { selectCurrentClassInfo } from "../../redux/store/slice/currentClassInfo";
@@ -91,7 +90,7 @@ const Rectangle = forwardRef(({ shapeProps, isSelected, onSelect, mediaWidth, me
         let nodeTopLeft = trRef.current.findOne('.top-left');
         //nodeTopLeft.fillPriority("color");
         nodeTopLeft.on('mouseenter', (evt) => {
-            // log('mouse enter')
+            log('mouse enter top left...')
             // nodeTopLeft.stroke('orange');
             // nodeTopLeft.fill('black');
 
@@ -362,34 +361,75 @@ const Rectangle = forwardRef(({ shapeProps, isSelected, onSelect, mediaWidth, me
 
                     return newBox;
                 }}
-                anchorStyleFunc={(anchor) => {
-                    // log('anchor')
-                    // log(anchor)
+                
 
-                    anchor.on('mouseenter', (evt) => {
 
-                        //log('mouse enter...')
-                        //anchor.fill('orange')
-                        //anchor.stroke('blue')
+                // anchorStyleFunc={(anchor) => {
+                //     // log('anchor')
+                //     // log(anchor)
 
-                        // evt.target.getLayer().forceUpdate()
+                //     anchor.on('mouseover', (evt) => {
 
-                    });
+                //         // log('(1) mouse enter...')
+                //         // log(evt.target.attrs.stroke)
+                //         // evt.target.stroke('red')
+                //         // anchor.fill('orange')
+                //         // anchor.stroke('blue')
 
-                    // anchor.cornerRadius(10);
-                    // if (anchor.hasName('top-center') || anchor.hasName('bottom-center')) {
-                    //     anchor.height(6);
-                    //     anchor.offsetY(3);
-                    //     anchor.width(30);
-                    //     anchor.offsetX(15);
-                    // }
-                    // if (anchor.hasName('middle-left') || anchor.hasName('middle-right')) {
-                    //     anchor.height(30);
-                    //     anchor.offsetY(15);
-                    //     anchor.width(6);
-                    //     anchor.offsetX(3);
-                    // }
-                }}
+                //         const myStroke=evt.target.attrs.stroke;
+                //         const myFill=evt.target.attrs.fill;
+
+                //         log(myStroke,myFill)
+                //         // this.stroke('red')
+                //         // this.fill('red')
+
+                //         evt.target.strokeWidth(4);
+
+                //         //this.stroke('#ff0000');
+                //         //this.fill(myStroke);
+                //         // evt.target.getLayer().forceUpdate()
+
+                //     });
+
+                //     // anchor.cornerRadius(10);
+                //     // if (anchor.hasName('top-center') || anchor.hasName('bottom-center')) {
+                //     //     anchor.height(6);
+                //     //     anchor.offsetY(3);
+                //     //     anchor.width(30);
+                //     //     anchor.offsetX(15);
+                //     // }
+                //     // if (anchor.hasName('middle-left') || anchor.hasName('middle-right')) {
+                //     //     anchor.height(30);
+                //     //     anchor.offsetY(15);
+                //     //     anchor.width(6);
+                //     //     anchor.offsetX(3);
+                //     // }
+                // }}
+
+                // anchorStyleFunc={ (anchor) => {
+                //     // anchor is Konva.Rect instance
+                //     // you manually change its styling
+                //     // anchor.cornerRadius(10);
+                //     // if (anchor.hasName('top-left') || anchor.hasName('top-right')) {
+                //     //   anchor.height(6);
+                //     //   anchor.offsetY(3);
+                //     //   anchor.width(30);
+                //     //   anchor.offsetX(15);
+                //     // }
+                //     // if (anchor.hasName('middle-left') || anchor.hasName('middle-right')) {
+                //     //   anchor.height(30);
+                //     //   anchor.offsetY(15);
+                //     //   anchor.width(6);
+                //     //   anchor.offsetX(3);
+                //     // }
+
+                //     anchor.on('mouseenter', (evt) => {
+
+                //         //log('anchor mouse over')
+                //         anchor.fill('red')
+        
+                //     });
+                // }}
             />
 
 

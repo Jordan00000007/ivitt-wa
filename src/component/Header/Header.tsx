@@ -8,7 +8,7 @@ import { selectIdTitle } from "../../redux/store/slice/currentTitle";
 import SwitchButtonGroup from '../Buttons/SwitchButtonGroup';
 
 import { GetAllProjectsType, clearAutolabelingAPI } from '../../constant/API';
-import { AlignWrapper, Container, ContainerLabel, FullTitle, FullTitleLabel, FullTitleWrapper, FullTitleWrapperLabel, HeaderContent, HeaderContentLabel, Logo, LogoLabel, MarqueeTitle, Title, TitleWrapper, BackButton } from './headerStyle';
+import { AlignWrapper, Container, ContainerLabel, FullTitle, FullTitleLabel,FullTitleLabel2, FullTitleWrapper, FullTitleWrapperLabel, HeaderContent, HeaderContentLabel, Logo, LogoLabel, MarqueeTitle, Title, TitleWrapper, BackButton } from './headerStyle';
 import TrainFunction from './TrainFunction';
 import { selectCurrentTab, setCurrentTab } from '../../redux/store/slice/currentTab';
 import { selectSocketId } from '../../redux/store/slice/socketId';
@@ -114,10 +114,10 @@ const Header = (props: HeaderProps) => {
           </AlignWrapper>
           <TrainFunction key={socketId} handleInitData={handleInitData} />
         </div>
-        <div style={{ display: currentTab === 'Label' ? '' : 'none', position: 'relative' }}>
+        <div style={{ display: currentTab === 'Label' ? '' : 'none', position: 'relative',cursor:'pointer' }}>
           <div style={{ position: 'absolute', left: -145, top: -25, backgroundColor: '#E61F23', paddingLeft: 10 }}>
             <FullTitleWrapperLabel>
-              <FullTitleLabel>{title}</FullTitleLabel>
+              <FullTitleLabel2>{title}</FullTitleLabel2>
             </FullTitleWrapperLabel>
           </div>
 
@@ -177,9 +177,12 @@ const Header = (props: HeaderProps) => {
     return (
       <>
         <ContainerLabel>
-          <HeaderContentLabel >
-            <LogoLabel onClick={() => { navigator('/allProjects'); }} src={logo} />
-            {switchTitle2(detectCurrentStyle(pathname))}
+          <HeaderContentLabel onClick={() => { navigator('/allProjects'); }}>
+            <LogoLabel  src={logo} />
+            <div style={{cursor:'pointer'}}>
+             {switchTitle2(detectCurrentStyle(pathname))}
+            </div>
+           
 
           </HeaderContentLabel>
           <div style={{ position: 'relative' }}>

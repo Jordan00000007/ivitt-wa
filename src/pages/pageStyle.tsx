@@ -75,6 +75,7 @@ export const StyledBtnOutline = styled(ButtonOutline)`
   height: 32px;
   margin: 0;
   border: 2px solid ${props => props.theme.color.highlight_1};
+
 `;
 
 export const Right = styled.div`

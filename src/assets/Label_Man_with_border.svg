@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="14.142" height="14.142" viewBox="0 0 14.142 14.142">
+	<defs>
+		
+		<rect id="icon" width="10" height="10" transform="translate(7.071) rotate(45)" />
+        <rect id="icon2" width="10" height="10" transform="translate(7) rotate(45)" />
+	</defs>
+
+	<g>
+		<use xlink:href="#icon2" class="outside" fill="#333333" /> 
+		<use xlink:href="#icon" class="inside" /> 
+	</g>
+</svg>

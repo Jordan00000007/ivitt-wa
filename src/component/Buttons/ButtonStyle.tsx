@@ -6,12 +6,13 @@ export const ButtonRed = styled.button`
   font-size: ${props => props.theme.typography.body1};
   border: 0;
   margin: 16px;
-  padding: 6px 10px;
+  padding: 4px 10px 6px 10px;
   border-radius: 6px;
   width: fit-content;
   height: 32px;
   font-family: 'Roboto', sans-serif;
   text-align: center;
+  
   transition: all 0.3s ease;
   cursor: pointer;
 
@@ -51,6 +52,8 @@ export const ButtonOutline = styled(ButtonRed)`
     border: 1px solid ${props => props.theme.color.divider};
     background: ${props => props.theme.color.base_2};
   }
+
+ 
 `;
 
 export const ButtonGray = styled(ButtonRed)`
