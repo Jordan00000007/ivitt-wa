@@ -52,7 +52,10 @@ const CustomSelectClass = forwardRef((props, ref) => {
     const classInfoPrev = useSelector(selectCurrentClassInfo).classInfoPrev;
     const classEditingIndex = useSelector(selectCurrentClassInfo).classEditingIndex;
     const classSelectedIndex = useSelector(selectCurrentClassInfo).classSelectedIndex;
-
+    
+    const autoBox = useSelector(selectCurrentBbox).autobox;
+    const labelIndex = useSelector(selectCurrentBbox).labelIndex;
+    const aiLabelIndex = useSelector(selectCurrentBbox).aiLabelIndex;
     const currentBbox = useSelector(selectCurrentBbox).bbox;
     const imageName = useSelector(selectCurrentBbox).imageName;
 
@@ -606,6 +609,53 @@ const CustomSelectClass = forwardRef((props, ref) => {
         }
 
     }, [currentBbox]);
+
+    useEffect(() => {
+
+        log('labelIndex change....')
+        log(labelIndex)
+
+        if (labelIndex>=0){
+           
+            const myClassName=currentBbox[labelIndex].class_name;
+
+            const myIndex = findIndex(classInfo, (e) => {
+                return e.class_name == myClassName;
+            }, 0);
+
+            setDialogOrder(-1);
+            setExpandClassMenu(false);
+            dispatch(setClassEditingIndex(-1));
+            dispatch(setClassSelectedIndex(myIndex));
+            inputClassRef.current.value = classInfo[myIndex].class_name;
+        }
+
+    
+    }, [labelIndex]);
+
+    useEffect(() => {
+
+       
+
+        if (aiLabelIndex>=0){
+           
+            const myClassName=autoBox[aiLabelIndex].class_name;
+
+            const myIndex = findIndex(classInfo, (e) => {
+                return e.class_name == myClassName;
+            }, 0);
+
+            setDialogOrder(-1);
+            setExpandClassMenu(false);
+            dispatch(setClassEditingIndex(-1));
+            dispatch(setClassSelectedIndex(myIndex));
+            inputClassRef.current.value = classInfo[myIndex].class_name;
+        }
+
+    
+    }, [aiLabelIndex]);
+
+    //labelIndex
 
     return (
 

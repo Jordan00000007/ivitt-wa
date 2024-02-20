@@ -1,7 +1,7 @@
 import Dialog, { DialogProps } from './Dialog';
 import { Title, ActionContainer, StyledButton, TipText, StyledButtonRed } from './commonDialogsStyle';
 import { useCallback, useEffect } from 'react';
-import { checkBestModelAPI } from '../../constant/API';
+import { checkBestModelAPI,stopTaskAPI } from '../../constant/API';
 import { stopTrainingAPI } from '../../constant/API/trainAPI';
 import { createAlertMessage } from '../../redux/store/slice/alertMessage';
 import { setIteration } from '../../redux/store/slice/currentIteration';
@@ -16,13 +16,16 @@ import { closeLoading, openLoading } from '../../redux/store/slice/loading';
 
 type StopTrainDialogProps = DialogProps & {
   currentID: string;
+  taskId:string;
   lastIter: string;
   getIterListCallback: () => void
 };
 
 
+
+
 const StopTrainDialog = (props: StopTrainDialogProps) => {
-  const { open, handleClose, currentID, lastIter, getIterListCallback, ...restProps } = props;
+  const { open, handleClose, currentID, taskId, lastIter, getIterListCallback, ...restProps } = props;
   const dispatch = useDispatch();
   const { getCurrTrainingInfo } = useGetCurrTrainInfo();
   const currentTab = useSelector(selectCurrentTab).tab;
@@ -37,6 +40,42 @@ const StopTrainDialog = (props: StopTrainDialogProps) => {
 
 
   const handleStopTrain = useCallback(() => {
+    dispatch(openLoading());
+    handleClose();
+    if (taskId!==''){
+      stopTaskAPI({task_uuid:taskId})
+      .then((res) => {
+        checkBestModelAPI(currentID, { iteration: lastIter })
+          .then((res) => {
+            setTimeout((() => {
+              dispatch(setIsTraining('stop'));
+              dispatch(closeLoading());
+              dispatch(createAlertMessage(customAlertMessage('success', 'Stop training')))
+            }), 8000)
+          })
+          .catch(({ response }) => {
+            if (currentTab !== 'model') {
+              setTimeout((() => {
+                backToDataset();
+                dispatch(createAlertMessage(customAlertMessage('success', 'Stop training with no best model')))
+              }), 8000)
+            }
+          })
+      })
+      .catch((err) => {
+        setTimeout((() => {
+          backToDataset();
+          dispatch(createAlertMessage(customAlertMessage('error', 'Stop training error')))
+        }), 8000)
+      })
+    }
+  
+
+  },
+    [backToDataset, currentID, currentTab, dispatch, handleClose, lastIter]
+  );
+
+  const handleStopTrain_xx = useCallback(() => {
     dispatch(openLoading());
     handleClose();
     stopTrainingAPI(currentID)

@@ -19,6 +19,31 @@ export const ProjectContainer = styled.div<{ noOverFlow: boolean }>`
   overflow: ${(props) => (props.noOverFlow ? 'hidden' : 'auto')};
   font-family: 'Roboto', sans-serif;
   
+  
+    *::-webkit-scrollbar,
+    &::-webkit-scrollbar {
+        width: 14px;
+    }
+
+    *::-webkit-scrollbar-track,
+    &::-webkit-scrollbar-track {
+        //background-color: ${(props) => props.theme.color.divider}60;
+        // box-shadow: -2px 3px 6px ${(props) => props.theme.color.divider}50;
+        // border-left: 0px solid #16272E3D;
+        // border-right: 0px solid #16272E3D;
+
+    }
+
+    *::-webkit-scrollbar-thumb,
+    &::-webkit-scrollbar-thumb {
+        background-color:  ${(props) => props.theme.color.divider};
+        border: 4px solid transparent;
+        border-radius: 100px;
+        background-clip: content-box;
+    }
+
+
+  
   @media(max-width: 1366px){
     justify-content: flex-start;
     overflow-x: auto;
@@ -29,7 +54,61 @@ export const ProjectContainer = styled.div<{ noOverFlow: boolean }>`
   }
 `;
 
-export const Wrapper = styled.div`
+export const SchedulerHeadContainer = styled.div<{ noOverFlow: boolean }>`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  height: 110px;
+  width: 100%;
+  overflow: hidden;
+  font-family: 'Roboto', sans-serif;
+  border-bottom: 1px solid #16272E3D;
+  background-color:#ffffff;
+  
+  @media(max-width: 1366px){
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+
+  @media(max-height: 850px){
+    overflow: auto;
+  }
+`;
+
+export const SchedulerHeadWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  margin: 24px 56px 0px 56px;
+  position: relative;
+  width: 1200px;
+  height: 86px;
+  
+`;
+
+export const SchedulerBodyContainer = styled.div<{ noOverFlow: boolean }>`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  height: calc(100vh - 166px);
+  width: 100%;
+  overflow: ${(props) => (props.noOverFlow ? 'hidden' : 'auto')};
+  font-family: 'Roboto', sans-serif;
+  
+  @media(max-width: 1366px){
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+
+  @media(max-height: 850px){
+    overflow: auto;
+  }
+`;
+
+export const SchedulerBodyWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -37,6 +116,18 @@ export const Wrapper = styled.div`
   margin: 36px 56px;
   position: relative;
   width: 1200px;
+  
+`;
+
+export const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  margin: 34px 56px;
+  position: relative;
+  width: 1200px;
+  
 `;
 
 export const MainWrapper = styled(Wrapper)`

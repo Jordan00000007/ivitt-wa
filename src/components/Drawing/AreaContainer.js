@@ -17,6 +17,8 @@ import { MainContext } from '../../pages/Main';
 import { selectCurrentBbox, setCurrentBbox, setSizeInfo, setLabelIndex, setAiLabelIndex, setImageName } from '../../redux/store/slice/currentBbox';
 import { selectCurrentClassInfo, setClassSelectedIndex, setFavLabels } from "../../redux/store/slice/currentClassInfo";
 
+import { selectCurrentIdx, setCurrentIdx } from "../../redux/store/slice/currentIdx";
+
 
 const AreaContainer = forwardRef((props, ref) => {
 
@@ -33,6 +35,7 @@ const AreaContainer = forwardRef((props, ref) => {
     const labelIndex = useSelector(selectCurrentBbox).labelIndex;
     const aiLabelIndex = useSelector(selectCurrentBbox).aiLabelIndex;
     const imageName = useSelector(selectCurrentBbox).imageName;
+    const currentIdx = useSelector(selectCurrentIdx).idx;
 
     const classInfo = useSelector(selectCurrentClassInfo).classInfo;
     const classSelectedIndex = useSelector(selectCurrentClassInfo).classSelectedIndex;
@@ -82,7 +85,7 @@ const AreaContainer = forwardRef((props, ref) => {
 
     const handleLayerClick = (e) => {
 
-        log('layer click')
+        //log('layer click')
         // window.document.body.classList.add('my-black-cursor')
 
         if ((props.toolSelect) && (dataType === 'object_detection')) {
@@ -93,6 +96,8 @@ const AreaContainer = forwardRef((props, ref) => {
             const sy = e.evt.offsetY;
 
             const areaResult = checkAreaIntersect(sx, sy);
+
+            
 
             const container = e.target.getStage().container();
 
@@ -154,6 +159,8 @@ const AreaContainer = forwardRef((props, ref) => {
                         dispatch(setLabelIndex(-1));
                         dispatch(setAiLabelIndex(myIdx));
                     }
+
+                    
                 }
 
 
@@ -204,7 +211,7 @@ const AreaContainer = forwardRef((props, ref) => {
 
         const myFileName = props.areaData.img_path.replace(/^.*[\/]/, '')
 
-        log('myFileName-------------->', myFileName)
+        //log('myFileName-------------->', myFileName)
 
         dispatch(setImageName(myFileName));
         dispatch(setLabelIndex(-1));
@@ -265,8 +272,8 @@ const AreaContainer = forwardRef((props, ref) => {
 
     const handleDrawingMouseUp = (event) => {
 
-        log('handle Outside Mouse Up');
-
+        dispatch(setCurrentIdx(currentIdx))
+        
         const tx = event.x;
         const ty = event.y;
 
@@ -429,7 +436,7 @@ const AreaContainer = forwardRef((props, ref) => {
 
         //event.preventDefault();
         //event.stopPropagation();
-        // event.preventDefault();
+        //event.preventDefault();
 
         if (newAnnotation.length === 1) {
             const sx = newAnnotation[0].x;
@@ -576,12 +583,7 @@ const AreaContainer = forwardRef((props, ref) => {
     const stageRef = useRef();
 
 
-    useEffect(() => {
-
-        log('img url ----------------------->')
-        log(`${apiHost}/display_img/${props.areaData.img_path.replace("./", "/")}`)
-
-    }, []);
+   
 
     useEffect(() => {
 
@@ -590,6 +592,8 @@ const AreaContainer = forwardRef((props, ref) => {
             setNewAnnotation([]);
         }
     }, [imageName]);
+
+
 
 
     return (

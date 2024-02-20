@@ -1,8 +1,9 @@
 import classNames from 'classnames';
 import { ReactNode, CSSProperties, HTMLAttributes } from 'react';
 import styled from 'styled-components';
+import { ReactComponent as Icon_More } from '../../assets/Icon_More.svg';
 
-const StyledButton = styled.button`
+const StyledButton = styled.div`
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -15,8 +16,7 @@ const StyledButton = styled.button`
   background-color: ${props => props.theme.color.base_3};
   opacity: 0.7;
   letter-spacing: 1px;
-  font-size: 14px;  
-  font-family:'Segoe UI', Verdana, sans-serif ;
+  
 
   &:hover {
     background-color: ${props => props.theme.color.divider};
@@ -39,7 +39,7 @@ type MoreButtonProps = {
   className?: string;
   disabled?: boolean;
   hide?: boolean;
-} & HTMLAttributes<HTMLButtonElement>;
+} & HTMLAttributes<HTMLDivElement>;
 
 const MoreButton = (props: MoreButtonProps) => {
   const { children, hide = false, className, ...restProps } = props;
@@ -47,7 +47,7 @@ const MoreButton = (props: MoreButtonProps) => {
   return (
 
     <StyledButton className={classNames(newClassName, className)} {...restProps}>
-      •••
+       <Icon_More ></Icon_More>
     </StyledButton>
 
 

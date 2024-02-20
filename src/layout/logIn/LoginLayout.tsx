@@ -2,6 +2,7 @@ import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Header from '../../component/Header/Header';
 import Projects from '../../pages/projects/Projects';
+import Scheduler from '../../pages/scheduler';
 
 import AutoLabel from '../../pages/autoLabel';
 
@@ -204,6 +205,7 @@ function LoginLayout() {
           <Routes>
             <Route path='/allProjects' element={<Projects noInitData={noInitData} initData={initData} handleInitData={handleInitData} />} />
             <Route path='main/:type/:id' element={<Main handleInitData={handleInitData} />} />
+            <Route path='/scheduler' element={<Scheduler />} />
             <Route path='/*' element={<Navigate to='/allProjects' />} />
           </Routes>
           <ShowURLDialog

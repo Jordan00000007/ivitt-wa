@@ -264,8 +264,11 @@ function LineChart(props: LineChartType) {
         handleDatasets(curveData)
       }
     }
-  }, [currentIter, curveData, datasetId, handleDatasets, trainData]);
 
+
+  
+
+  }, [currentIter, curveData, datasetId, handleDatasets, trainData]);
 
 
   return (

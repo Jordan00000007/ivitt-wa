@@ -2,6 +2,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import styled from 'styled-components';
 import StyledMenuItem from './StyledMenuItem'
 import StyledSelectInput from './StyledSelectInput';
+import {useEffect,useRef} from 'react';
 
 
 export const MenuItemStyled = styled(StyledMenuItem)`
@@ -81,7 +82,7 @@ const SelectMenu = (props: SelectMenuProps) => {
         renderValue={value => value ? <MenuItemText>{value}</MenuItemText> : <PlaceholderText>-- Please select --</PlaceholderText>}
       >
         {menuItemArray.map((item) => (
-          <MenuItemStyled key={item} value={item} >
+          <MenuItemStyled key={item} value={item} selected={true}>
             {item === 'iCAP' ?
               <MenuItemText className='noCapitalize'>{item}</MenuItemText>
               :

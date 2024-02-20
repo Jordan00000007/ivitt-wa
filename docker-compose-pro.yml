@@ -1,0 +1,22 @@
+version: "3.7" # 目前使用的版本，可以參考官網：
+services: # services 關鍵字後面列出 web, redis 兩項專案中的服務
+  Website:
+    restart: always
+    build: 
+      context: ./
+      dockerfile: Dockerfile # Build 在同一資料夾的 Dockerfile（描述 Image 要組成的 yaml 檔案）成 container
+    image: innodiskorg/ivit-t-website:v130
+    container_name: ivit-t-website
+    environment:
+      - WEB_PORT=8130
+      - API_PORT=6632
+    command: >
+      /bin/sh -c
+      "envsubst '
+      $${WEB_PORT}
+      $${API_PORT}
+      '< /etc/nginx/nginx.conf.template
+      > /etc/nginx/nginx.conf
+      && nginx -g 'daemon off;'"
+    network_mode: host
+

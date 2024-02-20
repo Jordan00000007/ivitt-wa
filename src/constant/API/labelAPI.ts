@@ -76,6 +76,9 @@ export type  ResIterationAPIType = {
 export const getIterationAPI = (Id: string) => 
 axios.get<ResIterationAPIType>(APIPath.label.getIteration(Id));
 
+export const getAutoLabelIterationAPI = (Id: string) => 
+axios.get<ResIterationAPIType>(APIPath.label.getAutoLabelIterList(Id));
+
 
 export type  AddClassType = {
     class_name: string,

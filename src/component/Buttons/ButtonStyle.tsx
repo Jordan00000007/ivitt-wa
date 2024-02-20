@@ -7,7 +7,7 @@ export const ButtonRed = styled.button`
   border: 0;
   margin: 16px;
   padding: 4px 10px 6px 10px;
-  border-radius: 6px;
+  border-radius: 4px;
   width: fit-content;
   height: 32px;
   font-family: 'Roboto', sans-serif;

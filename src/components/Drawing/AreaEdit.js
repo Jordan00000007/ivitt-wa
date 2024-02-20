@@ -88,11 +88,32 @@ const Rectangle = forwardRef(({ shapeProps, isSelected, onSelect, mediaWidth, me
         // trRef.current.rotateAnchorCursor('grab');
 
         let nodeTopLeft = trRef.current.findOne('.top-left');
+
+        //log('--- node top left ---')
+        //log(nodeTopLeft)
+
+        shapeRef.current.on('mouseover', function () {
+            // 在這裡設置懸停時的錨點樣式
+            //nodeTopLeft.anchorStroke('red');
+            //nodeTopLeft.anchorFill('yellow');
+
+            nodeTopLeft.stroke('orange');
+            nodeTopLeft.fill('black');
+            trRef.current.getLayer().draw();
+        });
+
         //nodeTopLeft.fillPriority("color");
-        nodeTopLeft.on('mouseenter', (evt) => {
-            log('mouse enter top left...')
-            // nodeTopLeft.stroke('orange');
-            // nodeTopLeft.fill('black');
+        nodeTopLeft.on('dragstart', (evt) => {
+            log('node top left dragstart ...')
+
+            //evt.target.getLayer().getStage().container().style.cursor='crosshair!important';
+
+            //log('cursor...')
+            //log(evt.target.getLayer().getStage().container().style.cursor)
+
+            nodeTopLeft.stroke('orange');
+            nodeTopLeft.fill('black');
+            trRef.current.getLayer().draw();
 
             // log(evt.target)
 
@@ -469,6 +490,9 @@ const AreaEdit = forwardRef((props, ref) => {
 
             if (labelIndex < currentBbox.length) {
                 setEditData(getRboxFromBbox(currentBbox[labelIndex], sizeInfo))
+
+
+                log('currentBbox[labelIndex]',currentBbox[labelIndex])
             }
             setMediaWidth(sizeInfo.mediaWidth);
             setMediaHeight(sizeInfo.mediaHeight)

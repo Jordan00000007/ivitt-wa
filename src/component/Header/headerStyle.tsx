@@ -55,7 +55,7 @@ export const ContainerLabel = styled.header`
 export const HeaderContent = styled.div`
   display: flex;
   position: relative;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   width: 1200px;
   max-width: 1200px;
@@ -79,9 +79,10 @@ export const HeaderContentLabel = styled.div`
 `;
 
 export const Logo = styled.img`
-  width: 168px;
+  // width: 168px;
+  height: 42px;
   cursor: pointer;
-  margin-right: 10px;
+  margin-right: 0px;
   margin-left: 0px;
 
   @media(max-width: 1366px){

@@ -17,20 +17,35 @@ const CustomButton = (props) => {
             )
         }
 
+       
+        if (props.name==="confirm"){
+            return (
+                <button onClick={props.onClick} className="my-button-submit">
+                    OK
+                </button>
+            )
+        }
+
         if (props.name==="view"){
             return (
-                <button onClick={props.onClick} className="my-button-view roboto-b1" style={((props.status==='run')||(props.status.indexOf('loading')>=0))?{width:'240px'}:{width:'115px'}} disabled={props.disabled}>
+                <button onClick={props.onClick} className="my-button-submit" style={{width:props.width,height:props.height}}>
                     View
                 </button>
             )
         }
 
-      
-
-        if (props.name==="confirm"){
+        if (props.name==="train"){
             return (
-                <button onClick={props.onClick} className="my-button-submit">
-                    OK
+                <button onClick={()=>props.onClick('train')} className={(props.active)?"my-button-small-active":"my-button-small-inactive"} style={{width:props.width,height:props.height}}>
+                    train
+                </button>
+            )
+        }
+
+        if (props.name==="val"){
+            return (
+                <button onClick={()=>props.onClick('val')} className={(props.active)?"my-button-small-active":"my-button-small-inactive"}  style={{width:props.width,height:props.height}}>
+                    val
                 </button>
             )
         }
@@ -41,6 +56,22 @@ const CustomButton = (props) => {
             return (
                 <button onClick={props.onClick} className="my-button-cancel">
                     Cancel
+                </button>
+            )
+        }
+
+        if (props.name==="stop"){
+            return (
+                <button onClick={props.onClick} className="my-button-cancel" style={{width:props.width,height:props.height}}>
+                    Stop
+                </button>
+            )
+        }
+
+        if (props.name==="stop-dialog"){
+            return (
+                <button onClick={props.onClick} className="my-button-submit" style={{width:props.width,height:props.height}}>
+                    Stop
                 </button>
             )
         }
@@ -98,6 +129,7 @@ const CustomButton = (props) => {
 
         return (
             <button onClick={props.onClick} className={props.className}>
+                {props.name}
             </button>
         );
 

@@ -113,7 +113,7 @@ function Dataset(props: DatasetPropsType) {
 
 
   const handleMoreButtonClick = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
+    (event: MouseEvent<HTMLDivElement>) => {
       event.stopPropagation();
       setAnchorMoreButton(event.currentTarget);
     },

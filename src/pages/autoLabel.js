@@ -14,7 +14,7 @@ import ModalDialog from '@mui/joy/ModalDialog';
 
 
 import { getAllProjectsAPI, toGetDatasetImgAPI, getBboxAPI, toGetClassAndNumberAPI, favoriteLabelAPI, addClassAPI } from '../constant/API';
-import { updateBboxAPI, getIterationAPI, modifyAutoLabelingParameterAPI, getAutoLabelingParameterAPI, openAutoLabelingAPI, inferAutoLabelingAPI, thresholdAPI, confirmStatusAPI } from '../constant/API';
+import { updateBboxAPI, getAutoLabelIterationAPI, modifyAutoLabelingParameterAPI, getAutoLabelingParameterAPI, openAutoLabelingAPI, inferAutoLabelingAPI, thresholdAPI, confirmStatusAPI } from '../constant/API';
 import { getAutolabelStatusAPI, setAutolabelStatusAPI, getImgLabelAPI } from '../constant/API';
 
 import { apiHost } from '../constant/API/APIPath';
@@ -68,12 +68,14 @@ const AnnotationItemPanel = styled.div({
 });
 
 const ThumbPanel = styled.div({
-    height: 'calc(100vh - 540px)',
+    //height: 'calc(100vh - 540px)',
     overflow: 'hidden',
     background: 'white',
     border: 0,
     paddingLeft: 10
 });
+
+
 
 
 const GUTTER_SIZE = 10;
@@ -137,8 +139,12 @@ const AutoLabel = forwardRef((props, ref) => {
 
     const gridRef = React.createRef();
 
+    const thumbRef = React.createRef();
+
     const alertRef = useRef();
     const undoAlertRef = useRef();
+    const drag1Ref = useRef();
+    const drag2Ref = useRef();
 
 
 
@@ -153,6 +159,14 @@ const AutoLabel = forwardRef((props, ref) => {
     const iterationParameterRef = useRef();
     const confidenceParameterRef = useRef();
     const AutoLabelingToggleRef = useRef();
+    const annotationPanelRef = useRef();
+    const annotationPanelItemsRef = useRef();
+
+    const [initialPos, setInitialPos] = useState(null);
+    const [initialSize1, setInitialSize1] = useState(null);
+    const [initialSize2, setInitialSize2] = useState(null);
+    const [initialSize3, setInitialSize3] = useState(null);
+    const [initialSize4, setInitialSize4] = useState(null);
 
     const currPath = useMemo(() => {
         if (currentTab !== 'Label') return { image_path: `undefined` };
@@ -245,6 +259,7 @@ const AutoLabel = forwardRef((props, ref) => {
     }
 
     useImperativeHandle(ref, () => ({
+
 
     }));
 
@@ -500,12 +515,14 @@ const AutoLabel = forwardRef((props, ref) => {
     const pageBackwardStyle = { width: 24, height: 24, cursor: 'pointer', transform: 'rotate(0deg)', fill: '#16272ED9', top: 1, position: 'absolute' };
     const pagePanelStyle = { backgroundColor: 'white', width: 132, height: 33, border: '1px solid #979CB580', borderRadius: '6px 6px 0px 0px', padding: '5px 8px 4px 8px' };
     const annotationPanelStyle = { backgroundColor: 'white', width: 300, height: 280, borderBottom: '1px solid #979CB580' };
-    const autoLabelingPanelStyle = { backgroundColor: 'white', width: 300, height: 150, borderBottom: '1px solid #979CB580' };
+    const autoLabelingPanelStyle = { backgroundColor: 'white', width: 300, height: 140, borderBottom: '1px solid #979CB580' };
     const datasetPanelStyle1 = { backgroundColor: 'white', width: 300, height: 'calc(100vh - 486px)' };
     const datasetPanelStyle2 = { backgroundColor: 'white', width: 300, height: 'calc(100vh - 336px)' };
     const panelTitleStyle = { fontFamily: 'Roboto, Medium', fontSize: 18, color: '#16272E', fontWeight: 500, padding: '16px 20px 10px 20px', width: 300 };
     const classItemStyle = { fontFamily: 'Roboto, Regular', fontSize: 15, color: '#16272E', padding: '9px 20px', width: 300, height: 36 };
     const descriptionStyle = { padding: '0px 20px', color: '#979CB5', fontSize: 13 };
+    const descriptionStyle2 = { padding: '0px 20px', color: '#979CB5', fontSize: 13, height: '100%', backgroundColor: 'green' };
+
     const thumbImageStyle = { width: 80, height: 80, border: '1px solid #979CB580', marginRight: 10, cursor: 'pointer' };
     const GridItemOdd = { display: 'flex', alignItems: 'center', justifyContent: 'center' };
     const GridItemEven = { display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f8f0' };
@@ -731,14 +748,21 @@ const AutoLabel = forwardRef((props, ref) => {
         setDefaultIteration(iterationParameterRef.current.getSelectedValue());
         setDefaultConfidence(confidenceParameterRef.current.getSelectedValue());
 
+
+        dispatch(openLoading());
+        setShowAutoLabelingSettingModal(false);
+
+
         modifyAutoLabelingParameterAPI(datasetId, myPayload)
             .then(({ status }) => {
                 log('modifyAutoLabelingParameterAPI-res', status);
-
-                setShowAutoLabelingSettingModal(false);
-
+                checkAutoBox();
+                dispatch(closeLoading());
             })
             .catch(({ response }) => {
+
+                dispatch(closeLoading());
+
                 log('modifyAutoLabelingParameterAPI-Error', response.data);
                 setShowType(1);
                 setShowText(response.data.message);
@@ -1138,11 +1162,11 @@ const AutoLabel = forwardRef((props, ref) => {
         return new Promise((resolve, reject) => {
             getAutolabelStatusAPI(datasetId)
                 .then(({ data }) => {
-                    log('getAutoLabelStatus-OK', data);
+                    //log('getAutoLabelStatus-OK', data);
                     resolve(data.data.autolabel_status);
                 })
                 .catch(({ response }) => {
-                    log('getAutoLabelStatus-Error', response.data);
+                    //log('getAutoLabelStatus-Error', response.data);
                     reject('getAutoLabelStatus-Error');
 
                     setShowType(1);
@@ -1372,6 +1396,41 @@ const AutoLabel = forwardRef((props, ref) => {
 
     }
 
+    const initial = (e) => {
+
+
+        let resizable1 = annotationPanelRef.current;
+        let resizable2 = annotationPanelItemsRef.current;
+        let resizable3 = thumbRef.current;
+
+        setInitialPos(e.clientY);
+        setInitialSize1(resizable1.offsetHeight);
+        setInitialSize2(resizable2.offsetHeight);
+        setInitialSize3(resizable3.offsetHeight);
+
+
+    }
+
+    const resize = (e) => {
+
+        const resizable1 = annotationPanelRef.current;
+        const resizable2 = annotationPanelItemsRef.current;
+        const resizable3 = thumbRef.current;
+
+        const h1 = parseInt(initialSize1) + parseInt(e.clientY - initialPos);
+        const h2 = parseInt(initialSize2) + parseInt(e.clientY - initialPos);
+        const h3 = parseInt(initialSize3) - parseInt(e.clientY - initialPos);
+
+        if ((h1 > 65) && (h1 < 700)) {
+            if (resizable1) resizable1.style.height = `${h1}px`;
+            if (resizable2) resizable2.style.height = `${h2}px`;
+            if (resizable3) resizable3.style.height = `${h3}px`;
+
+        }
+
+    }
+
+ 
 
     useEffect(() => {
         dispatch(openLoading());
@@ -1385,12 +1444,7 @@ const AutoLabel = forwardRef((props, ref) => {
 
     }, []);
 
-    useEffect(() => {
 
-        log('currentIdx=============================', currentIdx)
-
-
-    }, [currentIdx]);
 
     useEffect(() => {
 
@@ -1400,9 +1454,9 @@ const AutoLabel = forwardRef((props, ref) => {
         if (dataType === 'object_detection') {
 
             // 取得AutoLabeling的參數    
-            getIterationAPI(datasetId)
+            getAutoLabelIterationAPI(datasetId)
                 .then(({ data }) => {
-                    log('getIterationAPI-res');
+                    log('getAutoLabelIterationAPI-res');
                     const IterationArr = [];
                     log(data.data.folder_name)
                     data.data.folder_name.forEach((item, idx) => {
@@ -1492,20 +1546,17 @@ const AutoLabel = forwardRef((props, ref) => {
 
     useEffect(() => {
 
-        if (classInfo.length===0){
+        if (classInfo.length === 0) {
             setToolDisable(true);
-        }else{
+        } else {
             setToolDisable(false);
         }
-      
+
 
     }, [classInfo]);
 
 
-    useEffect(() => {
-
-        log('image change', imageName)
-
+    const checkAutoBox=()=>{
         if ((imageName !== '') && (dataType === 'object_detection') && (showAutoLabelPanel)) {
 
             const myPayload = {};
@@ -1543,6 +1594,14 @@ const AutoLabel = forwardRef((props, ref) => {
                 })
 
         }
+    }
+
+
+    useEffect(() => {
+
+        log('image change', imageName)
+
+        checkAutoBox();
 
     }, [imageName]);
 
@@ -1564,14 +1623,9 @@ const AutoLabel = forwardRef((props, ref) => {
                         <div className="row">
                             <div className="col-12 position-absolute top-0 start-0 d-flex justify-content-between" style={topPanelStyle}>
 
-
-
                                 <CustomSelectClass defaultValue={0} ref={classSelectorRef} onClassModifyDone={handleClassModifyDone} onClassChange={handleClassChange} onDeleteClass={handleDeleteClass} showDeleteConfirmModal={showDeleteConfirmModal} onAlert={handleAlertShow}></CustomSelectClass>
 
-
                                 <ClassButtonPanel combinedClass={combinedClass} onClick={handleClassButtonClick} onClassChange={handleClassChange} confirmStatus={confirmStatus}></ClassButtonPanel>
-
-
 
                             </div>
                         </div>
@@ -1591,7 +1645,7 @@ const AutoLabel = forwardRef((props, ref) => {
 
                                                         <div className="d-flex align-items-center justify-content-center" style={{ height: 'calc(100vh - 312px)', width: 'calc(100vw - 512px)' }}>
                                                             <OutsideClickHandler onOutsideClick={handleOutsideClick}>
-                                                                <AreaContainer areaData={dataSetList[currentIdx]} height={height} width={width} selectedLabelIdx={selectedLabelIdx} confirmStatus={confirmStatus} currentSelectedClass={currentSelectedClass} toolSelect={toolSelect} onBoxChange={handleBoxChange}></AreaContainer>
+                                                                <AreaContainer currentIdx={currentIdx} areaData={dataSetList[currentIdx]} height={height} width={width} selectedLabelIdx={selectedLabelIdx} confirmStatus={confirmStatus} currentSelectedClass={currentSelectedClass} toolSelect={toolSelect} onBoxChange={handleBoxChange}></AreaContainer>
                                                             </OutsideClickHandler>
                                                         </div>
 
@@ -1642,12 +1696,12 @@ const AutoLabel = forwardRef((props, ref) => {
                                             <div style={toolPanelStyle}>
                                                 <div style={{ width: 48, height: 48, padding: 0, position: 'relative' }} className='d-flex justify-content-center align-items-center' onClick={handleSelectLabel}>
                                                     <DrawingTooltip title="Select . Draw" keyword="S">
-                                                        <Icon_Point className={(toolDisable)?'my-tool-icon-select-disabled':toolSelect ? 'my-tool-icon-select-selected' : 'my-tool-icon-select'} onClick={handleSelectLabel}></Icon_Point>
+                                                        <Icon_Point className={(toolDisable) ? 'my-tool-icon-select-disabled' : toolSelect ? 'my-tool-icon-select-selected' : 'my-tool-icon-select'} onClick={handleSelectLabel}></Icon_Point>
                                                     </DrawingTooltip>
                                                 </div>
                                                 <div style={{ width: 48, height: 48, padding: 0, position: 'relative' }} className='d-flex justify-content-center align-items-center' onClick={handleDeleteLabel} name="deleteLabel">
                                                     <DrawingTooltip title="Delete" keyword="Delete">
-                                                        <Icon_Delete className={(toolDisable)?'my-tool-icon-delete-disabled':'my-tool-icon-delete'} name="deleteLabel"></Icon_Delete>
+                                                        <Icon_Delete className={(toolDisable) ? 'my-tool-icon-delete-disabled' : 'my-tool-icon-delete'} name="deleteLabel"></Icon_Delete>
                                                     </DrawingTooltip>
 
                                                 </div>
@@ -1663,7 +1717,7 @@ const AutoLabel = forwardRef((props, ref) => {
                     <div className="col-4" style={rightPanelStyle}>
                         <div className="row">
                             <div className="col-12 p-0">
-                                <div style={annotationPanelStyle}>
+                                <div style={annotationPanelStyle} ref={annotationPanelRef}>
                                     <div className="container">
                                         <div className="row">
                                             <div className="col-12 d-flex justify-content-between" style={panelTitleStyle}>
@@ -1682,37 +1736,65 @@ const AutoLabel = forwardRef((props, ref) => {
 
                                             </div>
                                         </div>
+
+                                        <div className="row" >
+                                            <div className="col-12 p-0" >
+
+
+
+
+                                                <div className="container" style={{ padding: '0px 12px 0px 0px' }} >
+                                                    <div className="my-annotation-panel" ref={annotationPanelItemsRef}>
+                                                        {
+                                                            ((currentBbox.length > 0) || (autoBox.length > 0)) ?
+                                                                <>
+                                                                    {
+                                                                        currentBbox.map((item, idx) => (
+                                                                            // <AnnotationItem key={`Label_${idx}`} labelIdx={idx} selectedLabelIdx={selectedLabelIdx} name={item.class_name} color={item.color_hex} filled={true} onClick={handleItemSelected}></AnnotationItem>
+                                                                            <AnnotationItem key={`Label_${idx}`} labelIdx={idx} className={item.class_name} onClick={handleItemSelected} ai={false}></AnnotationItem>
+                                                                        ))
+
+                                                                    }
+                                                                    {
+                                                                        autoBox.map((item, idx) => (
+                                                                            // <AnnotationItem key={`Label_${idx}`} labelIdx={idx} selectedLabelIdx={selectedLabelIdx} name={item.class_name} color={item.color_hex} filled={true} onClick={handleItemSelected}></AnnotationItem>
+                                                                            <AnnotationItem key={`AiLabel_${idx}`} labelIdx={idx} className={item.class_name} onClick={handleItemSelected} ai={true}></AnnotationItem>
+                                                                        ))
+
+                                                                    }
+                                                                </>
+                                                                :
+                                                                <div style={descriptionStyle}>
+                                                                    Start annotating your images now, easily categorize and organize your content!
+                                                                </div>
+                                                        }
+                                                    </div>
+                                                </div>
+
+
+
+                                            </div>
+                                        </div>
+
+
+
                                         <div className="row">
-                                            <div className="col-12 p-0">
-                                                {
+                                            <div className="col-12 d-flex" style={{ padding: 0 }}>
+                                                <div style={{ width: 300, height: 10, position: 'relative', backgroundColor: 'white' }}>
+                                                    <div style={{ position: 'absolute', top: 6, backgroundColor: 'transparent', height: 11, width: 300, cursor: 'row-resize' }} ref={drag1Ref}
+                                                        draggable='true'
+                                                        onDragStart={initial}
+                                                        onDrag={resize}
+                                                        onDragOver={e => {
+                                                            e.dataTransfer.effectAllowed = "all";
+                                                            e.dataTransfer.dropEffect = "move";
+                                                            e.preventDefault();
 
-
-                                                    ((currentBbox.length > 0) || (autoBox.length > 0)) ?
-                                                        <div className="container" style={{padding:'0px 12px 0px 0px'}}>
-                                                            <div className="my-annotation-panel">
-                                                            {
-                                                                currentBbox.map((item, idx) => (
-                                                                    // <AnnotationItem key={`Label_${idx}`} labelIdx={idx} selectedLabelIdx={selectedLabelIdx} name={item.class_name} color={item.color_hex} filled={true} onClick={handleItemSelected}></AnnotationItem>
-                                                                    <AnnotationItem key={`Label_${idx}`} labelIdx={idx} className={item.class_name} onClick={handleItemSelected} ai={false}></AnnotationItem>
-                                                                ))
-
-                                                            }
-                                                            {
-                                                                autoBox.map((item, idx) => (
-                                                                    // <AnnotationItem key={`Label_${idx}`} labelIdx={idx} selectedLabelIdx={selectedLabelIdx} name={item.class_name} color={item.color_hex} filled={true} onClick={handleItemSelected}></AnnotationItem>
-                                                                    <AnnotationItem key={`AiLabel_${idx}`} labelIdx={idx} className={item.class_name} onClick={handleItemSelected} ai={true}></AnnotationItem>
-                                                                ))
-
-                                                            }
-                                                            </div>
-                                                        </div>
-                                                        :
-                                                        <div style={descriptionStyle}>
-                                                            Start annotating your images now, easily categorize and organize your content!
-                                                        </div>
-
-                                                }
-
+                                                        }}
+                                                    >
+                                                        &nbsp;
+                                                    </div>
+                                                </div>
 
                                             </div>
                                         </div>
@@ -1722,43 +1804,64 @@ const AutoLabel = forwardRef((props, ref) => {
                         </div>
                         {
                             (showAutoLabelPanel) ?
-
-                                <div className="row">
-                                    <div className="col-12 p-0">
-                                        <div style={autoLabelingPanelStyle}>
-                                            <div className="container">
-                                                <div className="row">
-                                                    <div className="col-12 d-flex justify-content-between align-items-start" style={panelTitleStyle}>
-                                                        <div >
-                                                            Auto labeling
-                                                        </div>
-                                                        <div style={{ position: 'relative' }}>
-                                                            <div style={{ position: 'absolute', top: 2, left: -35 }}>
-                                                                <ToggleButton status='stop' onChange={handleAutoLabelingToggle} ref={AutoLabelingToggleRef}></ToggleButton>
+                                <>
+                                    <div className="row">
+                                        <div className="col-12 p-0">
+                                            <div style={autoLabelingPanelStyle}>
+                                                <div className="container">
+                                                    <div className="row">
+                                                        <div className="col-12 d-flex justify-content-between align-items-start" style={panelTitleStyle}>
+                                                            <div >
+                                                                Auto labeling
                                                             </div>
+                                                            <div style={{ position: 'relative' }}>
+                                                                <div style={{ position: 'absolute', top: 2, left: -35 }}>
+                                                                    <ToggleButton status='stop' onChange={handleAutoLabelingToggle} ref={AutoLabelingToggleRef}></ToggleButton>
+                                                                </div>
 
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div className="row">
-                                                    <div className="col-12" style={descriptionStyle}>
-                                                        Simplify your image annotation process and save time with our automated labeling function.
-                                                        <span className='my-setting-button' onClick={handleAutoLabelingSetting}>
-                                                            Settings.
-                                                        </span>
+                                                    <div className="row">
+                                                        <div className="col-12" style={descriptionStyle}>
+                                                            Simplify your image annotation process and save time with our automated labeling function.
+                                                            <span className='my-setting-button' onClick={handleAutoLabelingSetting}>
+                                                                Settings.
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                    <div className="row">
+                                        <div className="col-12 d-flex" style={{ padding: 0 }}>
+                                            <div style={{ width: 300, height: 10, position: 'relative', backgroundColor: 'white' }}>
+                                                <div style={{ position: 'absolute', top: -6, backgroundColor: 'transparent', height: 11, width: 300, cursor: 'row-resize' }} ref={drag2Ref}
+                                                    draggable='true'
+                                                    onDragStart={initial}
+                                                    onDrag={resize}
+                                                    onDragOver={e => {
+                                                        e.dataTransfer.effectAllowed = "all";
+                                                        e.dataTransfer.dropEffect = "move";
+                                                        e.preventDefault();
+
+                                                    }}
+                                                >
+                                                    &nbsp;
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </>
                                 :
                                 <></>
                         }
 
                         <div className="row">
                             <div className="col-12 p-0">
-                                <div style={(showAutoLabelPanel)?datasetPanelStyle1:datasetPanelStyle2}>
+                                <div style={(showAutoLabelPanel) ? datasetPanelStyle1 : datasetPanelStyle2}>
                                     <div className="container">
                                         <div className="row">
                                             <div className="col-12 d-flex flex-row justify-content-between" style={panelTitleStyle}>
@@ -1775,7 +1878,7 @@ const AutoLabel = forwardRef((props, ref) => {
                                                 {
                                                     (dataSetList.length > 0) &&
 
-                                                    <ThumbPanel>
+                                                    <ThumbPanel style={{ height: (showAutoLabelPanel) ? 'calc(100vh - 550px)' : 'calc(100vh - 405px)' }} ref={thumbRef}>
                                                         <AutoSizer>
                                                             {({ height, width }) => (
                                                                 <Grid className="my-grid-panel"
@@ -1784,7 +1887,7 @@ const AutoLabel = forwardRef((props, ref) => {
                                                                     height={height}
                                                                     rowCount={Math.ceil(dataSetList.length / 3)}
                                                                     rowHeight={80 + GUTTER_SIZE}
-                                                                    width={width-3}
+                                                                    width={width - 3}
                                                                     ref={gridRef}
                                                                     initialScrollTop={(currentIdx > 12) ? Math.floor(currentIdx / 3) * 90 : 0}
 
@@ -1797,7 +1900,7 @@ const AutoLabel = forwardRef((props, ref) => {
                                                                             style={{
                                                                                 ...style,
                                                                                 // backgroundColor: '#f1f1f1',
-                                                                                backgroundColor: ((columnIndex + rowIndex * 3) < dataSetList.length) ?'#f1f1f1':'#fff',
+                                                                                backgroundColor: ((columnIndex + rowIndex * 3) < dataSetList.length) ? '#f1f1f1' : '#fff',
                                                                                 border: '0px solid #979CB580',
                                                                                 left: style.left + GUTTER_SIZE,
                                                                                 top: style.top + GUTTER_SIZE,

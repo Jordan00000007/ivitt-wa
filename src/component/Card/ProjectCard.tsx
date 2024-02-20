@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { allProjectsType } from '../../pages/projects/hook/useAllProjects';
 import { convertUnit } from '../../utils/utils';
 import { apiHost } from '../../constant/API/APIPath';
+import { getIterationAPI } from '../../constant/API';
 
 const Card = styled.div`
   width: 282px;
@@ -31,7 +32,7 @@ const ProjectName = styled(OverflowHide)`
   font-size: ${props => props.theme.typography.h4};
   max-width: 200px;
   cursor: default;
-  text-transform: capitalize;
+  // text-transform: capitalize;
 `
 
 const Head = styled.div`
@@ -87,12 +88,13 @@ const DataCardWrapper = styled.div`
 type ProjectCardProps = {
   data: allProjectsType;
   setAnchorMoreButton: (open: null | HTMLElement) => void;
+  setShowExportItem: (data:boolean) => void;
   targetProject: (data: any) => void;
 };
 
 
 const ProjectCard = (props: ProjectCardProps) => {
-  const { data, setAnchorMoreButton, targetProject } = props;
+  const { data, setAnchorMoreButton, targetProject ,setShowExportItem} = props;
   const textRef = useRef<HTMLDivElement>(null);
   const [overflowActive, setOverflowActive] = useState(false);
   const navigate = useNavigate();
@@ -104,8 +106,16 @@ const ProjectCard = (props: ProjectCardProps) => {
   }, []);
 
   const handleMoreButtonClick = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
+    (event: MouseEvent<HTMLDivElement>,modelCount:number) => {
       event.stopPropagation();
+
+     
+      if (modelCount>0){
+        setShowExportItem(true);
+      }else{
+        setShowExportItem(false);
+      }
+
       setAnchorMoreButton(event.currentTarget);
     },
     [setAnchorMoreButton]
@@ -142,12 +152,14 @@ const ProjectCard = (props: ProjectCardProps) => {
           </StyledTooltip>
           <MoreButton
             onClick={(e) => {
-              handleMoreButtonClick(e);
+              handleMoreButtonClick(e,data.iteration);
+              console.log('more button click...')
               if (targetProject) targetProject(data);
             }}
+           
           />
         </Head>
-        <ProjectTag className={'blue'} text={data.platform} />
+        <ProjectTag className={'blue'} text={(data.platform==='intel')?'Intel':(data.platform==='nvidia')?'NVIDIA':data.platform}/>
         <ProjectTag className={'green'} text={(data.type==='classification')?'Classification':(data.type==='object_detection')?'Object Detection':data.type} />
         {!data.coverImg ?
           <NoCoverPhoto><NoImgIcon /></NoCoverPhoto>

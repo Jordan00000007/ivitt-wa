@@ -47,3 +47,23 @@ export type  ResTypeListType = {
 };
 
 export const getTypeListAPI = () => axios.get<ResTypeListType>(APIPath.projects.getTypeList);
+
+export type  ExportType = {
+  uuid: string,
+  change_workspace: string,
+  iteration : string[];
+};
+
+export const exportAPI = (info:ExportType) => axios.post(APIPath.projects.export, info);
+
+
+export type  ImportType = {
+  
+  custom_name : FormData,
+ 
+ 
+};
+
+export const importAPI = (info:FormData) => axios.post(APIPath.projects.import, info,  { headers:{'Content-Type': 'multipart/form-data'}});
+
+

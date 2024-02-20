@@ -5,8 +5,8 @@
 // export const apiHost = `http://172.16.92.124:6550`;
 // export const socketHost = `${apiHost}`;
 
-export const apiHost = `http://192.168.8.134:6530`;
-export const socketHost = `${apiHost}`;
+export const apiHost:string = `http://192.168.8.134:6530`;
+export const socketHost:string = `${apiHost}`;
 
 //http://10.204.16.134:6538/allProjects
 
@@ -21,6 +21,9 @@ const APIPath = {
     deleteProject: (Id: string) => `${apiHost}/${Id}/delete_project`,
     getPlatformList: `${apiHost}/get_platform`,
     getTypeList: `${apiHost}/get_type`,
+    export: `${apiHost}/export`,
+    import: `${apiHost}/import`,
+    
   },
   dataset:{
     toGetDatasetImg: (Id: string) => `${apiHost}/${Id}/filter_dataset`,
@@ -50,6 +53,7 @@ const APIPath = {
     confirmStatus: (Id: string) => `${apiHost}/${Id}/confirm_status`,
     autolabelStatus: (Id: string) => `${apiHost}/${Id}/autolabel_status`,
     clearAutolabeling: (Id: string) => `${apiHost}/${Id}/clear_autolabeling`,
+    getAutoLabelIterList: (Id: string) => `${apiHost}/${Id}/autolabel_get_iteration`,
   
     
   },
@@ -70,6 +74,11 @@ const APIPath = {
     startTraining: (Id: string) => `${apiHost}/${Id}/start_training`,
     stopTraining: (Id: string) => `${apiHost}/${Id}/stop_training`,
     projectTrainStatus: `${apiHost}/prj_training_status`,
+    history: ()=>`${apiHost}/history`,
+    trainingTask: ()=>`${apiHost}/training_schedule`,
+    delTrainingTask: ()=>`${apiHost}/training_schedule`,
+    
+    stopTask: ()=>`${apiHost}/stop_task`,
   },
   evaluate:{
     uploadEvalImages: (Id: string) => `${apiHost}/${Id}/upload_eval_img`,

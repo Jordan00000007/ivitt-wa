@@ -113,13 +113,15 @@ export const getBboxFromRbox=(rbox,sizeInfo)=>{
 
 
 export const checkPointInRect=(myPoint,myBbox,sizeInfo)=>{
-  
+
+
+    const shiftPixel=10;
     const ratioX=sizeInfo.mediaWidth/sizeInfo.imageWidth;
     const ratioY=sizeInfo.mediaHeight/sizeInfo.imageHeight;
-    const x1=Math.min(Math.round(myBbox[0]*ratioX),Math.round(myBbox[2]*ratioX));
-    const y1=Math.min(Math.round(myBbox[1]*ratioY),Math.round(myBbox[3]*ratioY));
-    const x2=Math.max(Math.round(myBbox[0]*ratioX),Math.round(myBbox[2]*ratioX));
-    const y2=Math.max(Math.round(myBbox[1]*ratioY),Math.round(myBbox[3]*ratioY));
+    const x1=(Math.min(Math.round(myBbox[0]*ratioX),Math.round(myBbox[2]*ratioX)))-shiftPixel;
+    const y1=(Math.min(Math.round(myBbox[1]*ratioY),Math.round(myBbox[3]*ratioY)))-shiftPixel;
+    const x2=(Math.max(Math.round(myBbox[0]*ratioX),Math.round(myBbox[2]*ratioX)));
+    const y2=(Math.max(Math.round(myBbox[1]*ratioY),Math.round(myBbox[3]*ratioY)));
     if ((myPoint.x >= x1) && (myPoint.x <= x2) && (myPoint.y >= y1) && (myPoint.y <= y2)) {
         return true;
     }else{

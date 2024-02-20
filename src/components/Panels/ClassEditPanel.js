@@ -141,9 +141,9 @@ const ClassEditPanel = forwardRef((props, ref) => {
             dispatch(setClassEditingIndex(-1));
             
             // (2) Update Local BBox 
-            // const myCurrentBox = cloneDeep(currentBbox);
-            // const myFilterBox = filter(myCurrentBox, function (o) { return o.class_name !== myClassName; });
-            // dispatch(setCurrentBbox(myFilterBox))
+            const myCurrentBox = cloneDeep(currentBbox);
+            const myFilterBox = filter(myCurrentBox, function (o) { return o.class_name !== myClassName; });
+            dispatch(setCurrentBbox(myFilterBox))
 
 
             // (3) Update Server Class Info

@@ -12,8 +12,9 @@ const Overlay = styled.div<OverlayProps>`
   height: 100%;
   top: 0;
   left: 0;
-  background-color: #969698;
-  opacity: 0.6;
+  //background-color: #ff0000;
+  //opacity: 0.6;
+  background-color:#0000001f; 
   z-index: 100;
 `;
 
