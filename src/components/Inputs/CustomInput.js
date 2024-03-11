@@ -10,19 +10,29 @@ const CustomInput = forwardRef((props, ref) => {
 
     const inputRef=useRef();
 
+    const isSpecialChar= (str) => {
+        //把特殊字符放在数组里
+        var specialchar = ['+', ' ', '/','?','%','&','='];
+        for (var key in specialchar) {
+            if (str.indexOf(specialchar[key]) != -1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     const handleTextChange = (evt) => {
-
-
 
         const oldName = inputValue;
         const newName = evt.target.value.replace("+", "").replace("/", "").replace("?", "").replace("%", "").replace("#", "").replace("&", "").replace("=", "").replace(" ", "");
-        if (newName.length!== evt.target.value.length){
-            props.onAlert(1,'Illegal character input');
-        }
-
-
+       
         setInputValue(newName);
-        props.onChange(newName, oldName);
+        if (isSpecialChar(evt.target.value)){
+            props.onAlert(1,'Illegal character input');
+            setInputValue(newName);
+        }else{
+            props.onChange(newName, oldName);
+        }
 
     }
 
@@ -42,18 +52,25 @@ const CustomInput = forwardRef((props, ref) => {
         }
     }));
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        log('the input value')
-        log(inputValue)
+    //     log('the input value')
+    //     log(inputValue)
 
-        if (inputValue === '') {
-            log('set default value')
-            setInputValue(props.defaultValue);
-        }
+    //     if (inputValue === '') {
+    //         log('set default value')
+    //         setInputValue(props.defaultValue);
+    //     }
 
 
-    }, [props.defaultValue,inputValue]);
+    // }, [props.defaultValue,inputValue]);
+
+     useEffect(() => {
+
+        setInputValue(props.defaultValue);
+
+
+    }, []);
 
     return (
         <div>

@@ -95,6 +95,7 @@ const ExportDialog = (props: ExportDialogProps) => {
 
     startExportAPI(currID, postData)
       .then(({ data }) => {
+
         //暫時先關掉，因第二次時WS都可以接到message
         // if (data.includes('The model has been converted')) {
 

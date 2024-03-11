@@ -440,41 +440,45 @@ const Scheduler = forwardRef((props, ref) => {
 
         const { source, destination, draggableId } = myData;
 
-        // log('source', source)
-        // log('destination', destination)
+        log('source', source)
+        log('destination', destination)
 
-        // 拷貝新的 items (來自 state) 
-        let newItems = [...taskList];
+        if (source.index!==destination.index){
 
-        const [remove] = newItems.splice(source.index, 1);
+            // 拷貝新的 items (來自 state) 
+            let newItems = [...taskList];
 
-        newItems.splice(destination.index, 0, remove);
+            const [remove] = newItems.splice(source.index, 1);
 
-        setTaskList(newItems);
+            newItems.splice(destination.index, 0, remove);
 
-        //log('newItems', newItems)
+            setTaskList(newItems);
+
+            //log('newItems', newItems)
 
 
-        const myPayload = Object.entries(newItems).map((item) => {
-            return Object.keys(item[1]).toString();
-        });
+            const myPayload = Object.entries(newItems).map((item) => {
+                return Object.keys(item[1]).toString();
+            });
 
-        log('myPayload', myPayload)
+            log('myPayload', myPayload)
 
-        modTrainingListAPI({ task_sort: myPayload })
-            .then(({ data }) => {
+            modTrainingListAPI({ task_sort: myPayload })
+                .then(({ data }) => {
 
-                if (data.status === 200) {
-                    log('modTrainingListAPI-Success', data);
-                } else {
-                    log('modTrainingListAPI-Error', data);
-                }
+                    if (data.status === 200) {
+                        log('modTrainingListAPI-Success', data);
+                    } else {
+                        log('modTrainingListAPI-Error', data);
+                    }
 
-            })
-            .catch(({ response }) => {
+                })
+                .catch(({ response }) => {
 
-                log('modTrainingListAPI-Error', response.data);
-            })
+                    log('modTrainingListAPI-Error', response.data);
+                })
+
+            }
 
     }
 
@@ -600,9 +604,9 @@ const Scheduler = forwardRef((props, ref) => {
         })
 
         // 在組件卸載時斷開連接
-        return () => {
-            socket.disconnect();
-        };
+        // return () => {
+        //     socket.disconnect();
+        // };
     }, []);
 
     useEffect(() => {
@@ -621,9 +625,9 @@ const Scheduler = forwardRef((props, ref) => {
         })
 
         // 在組件卸載時斷開連接
-        return () => {
-            socket.disconnect();
-        };
+        // return () => {
+        //     socket.disconnect();
+        // };
     }, []);
 
     useEffect(() => {
@@ -646,9 +650,9 @@ const Scheduler = forwardRef((props, ref) => {
             })
 
             // 在組件卸載時斷開連接
-            return () => {
-                socket.disconnect();
-            };
+            // return () => {
+            //     socket.disconnect();
+            // };
         }
 
     }, [projectId]);
@@ -689,9 +693,9 @@ const Scheduler = forwardRef((props, ref) => {
         })
 
         // 在組件卸載時斷開連接
-        return () => {
-            socket.disconnect();
-        };
+        // return () => {
+        //     socket.disconnect();
+        // };
 
 
     }, [projectId]);

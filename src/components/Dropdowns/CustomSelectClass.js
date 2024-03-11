@@ -45,6 +45,8 @@ const CustomSelectClass = forwardRef((props, ref) => {
 
     const [currentClassInput, setCurrentClassInput] = useState('');
 
+    const [textChange, setTextChange] = useState('');
+
     const classEditPanelRef=useRef();
 
 
@@ -52,6 +54,7 @@ const CustomSelectClass = forwardRef((props, ref) => {
     const classInfoPrev = useSelector(selectCurrentClassInfo).classInfoPrev;
     const classEditingIndex = useSelector(selectCurrentClassInfo).classEditingIndex;
     const classSelectedIndex = useSelector(selectCurrentClassInfo).classSelectedIndex;
+    const favLabels = useSelector(selectCurrentClassInfo).favLabels;
     
     const autoBox = useSelector(selectCurrentBbox).autobox;
     const labelIndex = useSelector(selectCurrentBbox).labelIndex;
@@ -247,6 +250,10 @@ const CustomSelectClass = forwardRef((props, ref) => {
 
         expandClassMenu ? setExpandClassMenu(false) : setExpandClassMenu(true);
 
+        if (expandClassMenu){
+            setTextChange(classInfo[classSelectedIndex].class_name);
+        } 
+
     };
 
     useEffect(() => {
@@ -331,8 +338,6 @@ const CustomSelectClass = forwardRef((props, ref) => {
             dispatch(setClassEditingIndex(-1));
             setExpandClassMenu(true);
 
-
-
             // update class name to server
             classInfo.forEach((item, idx) => {
 
@@ -375,6 +380,86 @@ const CustomSelectClass = forwardRef((props, ref) => {
                         });
                 }
             })
+
+            // update class name to server
+            log('update class name to server ----------------------')
+
+            // log('new name')
+            // log(textChange)
+            // log('old name')
+            // log(classInfo[classEditingIndex].class_name)
+
+            const newName=textChange;
+            const oldName=classInfo[classEditingIndex].class_name;
+            if ((newName!=='')&&(newName!==oldName)){
+
+                // check new name exist or not
+                let flag=false;
+                const myClassInfo = cloneDeep(classInfo);
+                myClassInfo.forEach((item,idx) => {
+                    if (classEditingIndex !== idx){
+                        if (myClassInfo[idx].class_name===newName){
+                            props.onAlert(1,'Class name exist already.');
+                            flag=true;
+                        }
+                    }                        
+                })
+
+
+
+                if (!flag){
+
+                
+                myClassInfo[classEditingIndex].class_name=newName;
+                myClassInfo.forEach((item) => {
+                    if (item.class_name === oldName)
+                        item.class_name = newName;
+                })
+
+                dispatch(setClassInfo(myClassInfo))
+
+                log('modify bbox')
+                const myCurrentBbox = cloneDeep(currentBbox);
+                myCurrentBbox.forEach((item, idx) => {
+                    log(item.class_name)
+                    if (item.class_name === oldName) {
+                        myCurrentBbox[idx].class_name = newName;
+                    }
+                })
+                dispatch(setCurrentBbox(myCurrentBbox));
+
+                log('modify autobox')
+                const myAutoBox = cloneDeep(autoBox);
+                myAutoBox.forEach((item, idx) => {
+                    log(item.class_name)
+                    if (item.class_name === oldName) {
+                        myAutoBox[idx].class_name = newName;
+                    }
+                })
+                dispatch(setAutoBox(myAutoBox));
+
+
+                log('modify favorite label name');
+                const myFavLabels = cloneDeep(favLabels);
+                myFavLabels.forEach((item, idx) => {
+                    log(item.class_name)
+                    if (item.class_name === oldName) {
+                        myFavLabels[idx].class_name = newName;
+                    }
+                })
+                dispatch(setFavLabels(myFavLabels));
+
+                const myPayload = {};
+                myPayload.class_name = oldName;
+                myPayload.new_name = newName;
+                renameClassAPI(datasetId, myPayload)
+                    .then(({ data }) => {
+                        log('rename success')
+
+                        props.onClassModifyDone();
+                    });
+                }
+            }
 
 
 
@@ -572,6 +657,11 @@ const CustomSelectClass = forwardRef((props, ref) => {
 
     }
 
+    const handleTextChange=(text)=>{
+        log('--- text change to :',text)
+        setTextChange(text);
+    }
+
 
     const editingPanelRef = useRef(null);
 
@@ -634,8 +724,6 @@ const CustomSelectClass = forwardRef((props, ref) => {
     }, [labelIndex]);
 
     useEffect(() => {
-
-       
 
         if (aiLabelIndex>=0){
            
@@ -709,7 +797,7 @@ const CustomSelectClass = forwardRef((props, ref) => {
 
                                         <div style={{ position: 'relative' }}>
                                             <div style={{ position: 'absolute', left: 120, top: dialogTop }}>
-                                                <ClassEditPanel data={props.data} dialogOrder={dialogOrder} onDeleteClassDone={handleClassModifyDone} onDeleteClass={handleDeleteClass} onAlert={props.onAlert} ref={classEditPanelRef}></ClassEditPanel>
+                                                <ClassEditPanel data={props.data} dialogOrder={dialogOrder} onDeleteClassDone={handleClassModifyDone} onDeleteClass={handleDeleteClass} onAlert={props.onAlert} ref={classEditPanelRef} onTextChange={handleTextChange}></ClassEditPanel>
                                             </div>
                                         </div>
 

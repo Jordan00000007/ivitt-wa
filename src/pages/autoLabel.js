@@ -1331,8 +1331,6 @@ const AutoLabel = forwardRef((props, ref) => {
         try {
             toGetDatasetImgAPI(datasetId, myPayload).then((data) => {
 
-                log('data.data.data.img_path ----->', data.data.data.img_path)
-
 
                 setImgDataList(data.data.data.img_path)
 

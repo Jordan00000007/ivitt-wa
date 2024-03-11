@@ -68,48 +68,77 @@ const ClassEditPanel = forwardRef((props, ref) => {
 
     }
 
+    //判断字符串是否存在(.点)(_下划线)(@艾特)
+    // const isSpecialChar= (str) => {
+    //     //把特殊字符放在数组里
+    //     var specialchar = ['+', ' ', '/','?','%','&','='];
+    //     for (var key in specialchar) {
+    //         if (str.indexOf(specialchar[key]) != -1) {
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // }
+
+
     const handleTextChange = (newName, oldName) => {
 
-        const myClassInfo = cloneDeep(classInfo);
-        myClassInfo.forEach((item) => {
-            if (item.class_name === oldName)
-                item.class_name = newName;
-        })
 
-        dispatch(setClassInfo(myClassInfo))
+        // '+',' ','/','?','%','#','&','=' 
 
-        log('modify bbox')
-        const myCurrentBbox = cloneDeep(currentBbox);
-        myCurrentBbox.forEach((item, idx) => {
-            log(item.class_name)
-            if (item.class_name === oldName) {
-                myCurrentBbox[idx].class_name = newName;
-            }
-        })
-        dispatch(setCurrentBbox(myCurrentBbox));
+        const checkValue=newName.replace("+","").replace("/","").replace("?","").replace("%","").replace("#","").replace("&","").replace("=","").replace(" ","");
+        
 
-        log('modify autobox')
-        const myAutoBox = cloneDeep(autoBox);
-        myAutoBox.forEach((item, idx) => {
-            log(item.class_name)
-            if (item.class_name === oldName) {
-                myAutoBox[idx].class_name = newName;
-            }
-        })
-        dispatch(setAutoBox(myAutoBox));
+        if (checkValue.length!== newName.length){
+
+            props.onAlert(1,'Illegal character input');
+
+        }else{
+
+            props.onTextChange(newName);            
+
+                // const myClassInfo = cloneDeep(classInfo);
+                // myClassInfo.forEach((item) => {
+                //     if (item.class_name === oldName)
+                //         item.class_name = newName;
+                // })
+
+                // dispatch(setClassInfo(myClassInfo))
+
+                // log('modify bbox')
+                // const myCurrentBbox = cloneDeep(currentBbox);
+                // myCurrentBbox.forEach((item, idx) => {
+                //     log(item.class_name)
+                //     if (item.class_name === oldName) {
+                //         myCurrentBbox[idx].class_name = newName;
+                //     }
+                // })
+                // dispatch(setCurrentBbox(myCurrentBbox));
+
+                // log('modify autobox')
+                // const myAutoBox = cloneDeep(autoBox);
+                // myAutoBox.forEach((item, idx) => {
+                //     log(item.class_name)
+                //     if (item.class_name === oldName) {
+                //         myAutoBox[idx].class_name = newName;
+                //     }
+                // })
+                // dispatch(setAutoBox(myAutoBox));
 
 
-        log('modify favorite label name');
-        const myFavLabels = cloneDeep(favLabels);
-        myFavLabels.forEach((item, idx) => {
-            log(item.class_name)
-            if (item.class_name === oldName) {
-                myFavLabels[idx].class_name = newName;
-            }
-        })
-        dispatch(setFavLabels(myFavLabels));
+                // log('modify favorite label name');
+                // const myFavLabels = cloneDeep(favLabels);
+                // myFavLabels.forEach((item, idx) => {
+                //     log(item.class_name)
+                //     if (item.class_name === oldName) {
+                //         myFavLabels[idx].class_name = newName;
+                //     }
+                // })
+                // dispatch(setFavLabels(myFavLabels));
 
+            
 
+        }
     }
 
 

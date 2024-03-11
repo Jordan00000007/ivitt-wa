@@ -98,7 +98,7 @@ const SliderCard = (props: SliderCardProps) => {
   const workspaceInfo = projectData['workspace'];
 
   const settings = {
-    infinite: false,
+    infinite: true,
     arrows: true,
     slidesToShow: 4,
     slidesToScroll: 4,

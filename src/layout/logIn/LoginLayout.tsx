@@ -20,6 +20,7 @@ import { selectColorBar, setColorBars } from '../../redux/store/slice/colorBar';
 import { getColorBarAPI } from '../../constant/API';
 
 
+
 const Wrapper = styled.div`
   background-color: ${props => props.theme.color.base_1};
 `;
@@ -105,7 +106,10 @@ function LoginLayout() {
             handelSetDefault();
           }
           if (convertInfo.selectExportTo === 'local') {
-            window.location.href = `http://${data.data.url}`;
+
+            const myUrl=socketHost+data.data.url.substring(data.data.url.indexOf("/"));
+            //window.location.href = `http://${myUrl}`;
+            window.location.href = myUrl;
             dispatch(createAlertMessage(customAlertMessage('success', 'Success')));
             handelSetDefault();
           }

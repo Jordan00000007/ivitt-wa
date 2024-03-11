@@ -22,19 +22,25 @@ const CustomWebSocket = (props: WebSocketProps) => {
 
     const connectWebSocket1 = () => {
 
-        setWs1(io(`${socketHost}/export`))
+        
+        const exportWs=io(`${socketHost}/export`);
+        initWebSocket1(exportWs);
+        setWs1(exportWs);
         
     }
 
     const connectWebSocket2 = () => {
 
-        setWs2(io(`${socketHost}/import`))
+        const importWs=io(`${socketHost}/import`);
+        initWebSocket2(importWs);
+        setWs2(importWs);
+        
         
     }
 
-    const initWebSocket1 = () => {
+    const initWebSocket1 = (myExportWs:any) => {
         //對 getMessage 設定監聽，如果 server 有透過 getMessage 傳送訊息，將會在此被捕捉
-        ws1.on('export', (message: any) => {
+        myExportWs.on('export', (message: any) => {
             console.log('------ export message -----')
             console.log(message)
             const myObj = JSON.parse(message);
@@ -77,11 +83,11 @@ const CustomWebSocket = (props: WebSocketProps) => {
     
     }
 
-    const initWebSocket2 = () => {
+    const initWebSocket2 = (myImportWs:any) => {
         //對 getMessage 設定監聽，如果 server 有透過 getMessage 傳送訊息，將會在此被捕捉
       
 
-        ws2.on('import', (message: any) => {
+        myImportWs.on('import', (message: any) => {
             console.log(new Date())
             console.log(message)
             const myObj = JSON.parse(message);
@@ -108,33 +114,33 @@ const CustomWebSocket = (props: WebSocketProps) => {
     }
 
    
-    useEffect(() => {
+    // useEffect(() => {
 
-        console.log('ws1 websocket start...')
-
-
-        if(ws1){
-            //連線成功在 console 中打印訊息
-            console.log('ws1 success connect!')
-            //設定監聽
-            initWebSocket1()
-        }
-
-    }, [ws1]);
-
-    useEffect(() => {
-
-        console.log('ws2 websocket start...')
+    //     console.log('ws1 websocket start...')
 
 
-        if(ws2){
-            //連線成功在 console 中打印訊息
-            console.log('ws2 success connect!')
-            //設定監聽
-            initWebSocket2()
-        }
+    //     if(ws1===null){
+    //         //連線成功在 console 中打印訊息
+    //         console.log('ws1 success connect!')
+    //         //設定監聽
+    //         initWebSocket1()
+    //     }
 
-    }, [ws2]);
+    // }, []);
+
+    // useEffect(() => {
+
+    //     console.log('ws2 websocket start...')
+
+
+    //     if(ws2===null){
+    //         //連線成功在 console 中打印訊息
+    //         console.log('ws2 success connect!')
+    //         //設定監聽
+    //         initWebSocket2()
+    //     }
+
+    // }, []);
 
     useEffect(() => {
        
